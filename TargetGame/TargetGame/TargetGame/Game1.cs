@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
+using System.Threading;
 
 namespace TargetGame
 {
@@ -18,6 +19,9 @@ namespace TargetGame
         MouseState _mState;
         bool _mReleased;
         int _score = 0;
+
+        double _timer = 10;
+        double _timerAbs;
 
         #region TARGET VARIABLES
 
@@ -60,6 +64,18 @@ namespace TargetGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            if(_timer > 0)
+            {
+                _timer -= gameTime.ElapsedGameTime.TotalSeconds;
+            }
+            if(_timer < 0)
+            {
+                _timer = 0;
+                Exit();
+            }
+            
+            _timerAbs = Math.Abs(_timer);
+
             _mState = Mouse.GetState();
 
             if(_mState.LeftButton == ButtonState.Pressed && _mReleased == true)
@@ -98,7 +114,7 @@ namespace TargetGame
             _spriteBatch.Draw(_skySprite, new Vector2(0, 0), Color.White);
             _spriteBatch.Draw(_targetSprite, new Vector2(_targetPosition.X - _targetRadius, _targetPosition.Y - _targetRadius), Color.White);
             _spriteBatch.DrawString(_gameFont, _score.ToString(), new Vector2(10, 10), Color.Black);
-
+            _spriteBatch.DrawString(_gameFont, Math.Ceiling(_timer/*Abs*/).ToString(), new Vector2(10, 50), Color.Black);
             _spriteBatch.End();
 
             base.Draw(gameTime);
