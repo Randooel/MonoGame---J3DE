@@ -14,14 +14,18 @@ namespace SpaceshipGame.Content
     {
         #region ASTEROID STUFF
         public Texture2D sprite;
-        public Vector2 position = new Vector2(1000, 100);
+        public Vector2 position = new Vector2(600, 360);
         public float speed;
-        public const int radius = 59;
+        public  int radius = 59;
         #endregion;
 
         public Asteroid(int newSpeed)
         {
             speed = newSpeed;
+
+            Random rand = new Random();
+
+            position = new Vector2(1380, rand.Next(0, 721));
         }
 
         public void AsteroidUpdate(GameTime gameTime)

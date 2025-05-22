@@ -19,6 +19,7 @@ namespace SpaceshipGame.Content
 
         public void TimerUpdate(GameTime gameTime)
         {
+            timer -= gameTime.ElapsedGameTime.TotalSeconds;
             if (timer > 0)
             {
                 timer --;

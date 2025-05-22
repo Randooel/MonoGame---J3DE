@@ -18,6 +18,7 @@ namespace SpaceshipGame
         Ship ship = new Ship();
         Timer timer = new Timer();
         Asteroid asteroid = new Asteroid(250);
+        Controller controller = new Controller();
 
         public Game1()
         {
@@ -59,11 +60,18 @@ namespace SpaceshipGame
             ship.ShipUdpate(gameTime);
 
             // TIMER LOGIC
-            timer.TimerUpdate(gameTime);
+            //timer.TimerUpdate(gameTime);
 
             // ASTEROID LOGIC
             asteroid.AsteroidUpdate(gameTime);
-            
+
+            controller.ConUpdate(gameTime);
+
+            for(int i = 0; i < controller.asteroids.Count; i++)
+            {
+                controller.asteroids[i].AsteroidUpdate(gameTime);
+            }
+
             base.Update(gameTime);
         }
 
@@ -71,17 +79,23 @@ namespace SpaceshipGame
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+
             _spriteBatch.Begin();
 
             _spriteBatch.Draw(space, new Vector2(0, 0), Color.White);
             // Centers the sprite into the intended point. It does so by subtracting half of the sprite's height and width
             _spriteBatch.Draw(ship.sprite, new Vector2(ship.position.X -34, ship.position.Y -50), Color.White);
-            _spriteBatch.Draw(asteroid.sprite, new Vector2(asteroid.position.X - asteroid.radius, asteroid.position.Y - asteroid.radius), Color.White);
+            
+            _spriteBatch.DrawString(ship.spaceFont, "SPACE", new Vector2(10, 0), Color.White);
+            _spriteBatch.DrawString(timer.timerFont, controller.timer.ToString(), new Vector2(10, 60), Color.White);
 
-            _spriteBatch.DrawString(ship.spaceFont, "SPACE", new Vector2(0, 0), Color.White);
-            _spriteBatch.DrawString(timer.timerFont, timer.ToString(), new Vector2(0, 50), Color.White);
+            for(int i = 0; i < controller.asteroids.Count; i++)
+            {
+                _spriteBatch.Draw(asteroid.sprite, new Vector2(controller.asteroids[i].position.X - controller.asteroids[i].radius, controller.asteroids[i].position.Y - asteroid.radius), Color.White);
+            }
 
             _spriteBatch.End();
+
 
             base.Draw(gameTime);
         }
