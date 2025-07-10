@@ -2,24 +2,36 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GeometryDrawer
 {
     public class WindmillDrawer
     {
         private GraphicsDevice _graphicsDevice;
+
+        // Moinho
         private VertexBuffer _vertexBuffer;
         private VertexPositionColor[] verts;
 
-        // Matriz
-        public Matrix _world = Matrix.Identity;
+        // Hélices
+        private VertexBuffer _hVertexBuffer;
+        private VertexPositionColor[] hVerts;
 
-        public void SetWorld(Matrix world)
+        // Matriz
+        private Matrix _world = Matrix.Identity;
+        private List<Matrix> _helixWorlds = new List<Matrix>();
+
+        private List<float> _helixRotations = new List<float>();
+        private List<float> _helixRotationSpeeds = new List<float>();
+        private static readonly Random _rng = new Random();
+
+        public void SetWorld(Matrix world) { _world = world; }
+
+        public void AddHelix(Matrix helixWorld)
         {
-            _world = world;
+            _helixWorlds.Add(helixWorld);
+            _helixRotations.Add(0f);
+            _helixRotationSpeeds.Add((float)(_rng.NextDouble() * 2 + 1)); // velocidade entre 1‑3 rad/s
         }
 
         public void SetWindmillInitialPos(Vector3 position, float rotationYDegrees, float scale)
@@ -32,11 +44,22 @@ namespace GeometryDrawer
             this.SetWorld(windmillInitialTransform);
         }
 
+        public void AddHelixInitialPos(Vector3 position, float rotationYDegrees, float rotationZDegrees, float scale)
+        {
+            Matrix helixScale = Matrix.CreateScale(scale);
+            Matrix helixRotation = Matrix.CreateRotationY(MathHelper.ToRadians(rotationYDegrees));
+            Matrix helixRotationZ = Matrix.CreateRotationZ(MathHelper.ToRadians(rotationZDegrees));
+            Matrix helixTranslation = Matrix.CreateTranslation(position);
+
+            Matrix helixInitialTransform = helixScale * helixRotation * helixRotationZ * helixTranslation;
+            AddHelix(helixInitialTransform);
+        }
+
         public WindmillDrawer(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
             CreateVertices();
-            CreateBuffer();
+            CreateBuffers();
         }
 
         // No geral, a mesma coisa com o cubo, só que com uma base traseira mais afastada
@@ -45,22 +68,17 @@ namespace GeometryDrawer
         private void CreateVertices()
         {
             verts = new VertexPositionColor[36];
-            // IPC: Caso algum triângulo esteja com a normal errada pra consertar é muito
-            // simples - basta trocar a posição e cor do primeiro e último vértice e...... (<- qtd de pontos pra indicar o tamanho da tela divida)
-            // VOILÀ
 
             //FRENTE DO CUBO
-            verts[0] = new VertexPositionColor(new Vector3(-1, 2, 0), Color.Gray); // Define posição e cor do vértice
-            verts[1] = new VertexPositionColor(new Vector3(1, 2, 0), Color.Gray); // " "
-            verts[2] = new VertexPositionColor(new Vector3(1, -1, 0), Color.Black); // " "
+            verts[0] = new VertexPositionColor(new Vector3(-1, 2, 0), Color.Gray);
+            verts[1] = new VertexPositionColor(new Vector3(1, 2, 0), Color.Gray);
+            verts[2] = new VertexPositionColor(new Vector3(1, -1, 0), Color.Black);
 
-            // Segundo triângulo para criação de um plano
             verts[3] = new VertexPositionColor(new Vector3(1, -1, 0), Color.Black);
             verts[4] = new VertexPositionColor(new Vector3(-1, -1, 0), Color.Black);
             verts[5] = new VertexPositionColor(new Vector3(-1, 2, 0), Color.Gray);
 
-            // TRASEIRA (Igual a frente do cubo, mas todo Z é -2)
-            // Precisa ser desenhado em direção anti-horária para a normal ficar para trás já que é a parte traseira do cubo
+            // TRASEIRA
             verts[6] = new VertexPositionColor(new Vector3(1, -1, -4), Color.Black);
             verts[7] = new VertexPositionColor(new Vector3(1, 2, -2), Color.Gray);
             verts[8] = new VertexPositionColor(new Vector3(-1, 2, -2), Color.Gray);
@@ -69,7 +87,7 @@ namespace GeometryDrawer
             verts[10] = new VertexPositionColor(new Vector3(1, -1, -4), Color.Black);
             verts[11] = new VertexPositionColor(new Vector3(-1, 2, -2), Color.Gray);
 
-            // TOPO (Mesma coisa que a frente só que todo Y é 1 e alguns Zs são -2)
+            // TOPO
             verts[12] = new VertexPositionColor(new Vector3(1, 2, -2), Color.Gray);
             verts[13] = new VertexPositionColor(new Vector3(1, 2, 0), Color.Gray);
             verts[14] = new VertexPositionColor(new Vector3(-1, 2, 0), Color.Gray);
@@ -87,7 +105,7 @@ namespace GeometryDrawer
             verts[22] = new VertexPositionColor(new Vector3(-1, 2, -2), Color.Gray);
             verts[23] = new VertexPositionColor(new Vector3(-1, 2, 0), Color.Gray);
 
-            // DIREITA (mesma coisa que esquerda, mas todo X é +1
+            // DIREITA
             verts[24] = new VertexPositionColor(new Vector3(1, -1, -4), Color.Black);
             verts[25] = new VertexPositionColor(new Vector3(1, -1, 0), Color.Black);
             verts[26] = new VertexPositionColor(new Vector3(1, 2, 0), Color.Gray);
@@ -96,7 +114,7 @@ namespace GeometryDrawer
             verts[28] = new VertexPositionColor(new Vector3(1, 2, -2), Color.Gray);
             verts[29] = new VertexPositionColor(new Vector3(1, -1, -4), Color.Black);
 
-            // BAIXO (mesma coisa que o topo, mas todo Y é -1)
+            // BAIXO
             verts[30] = new VertexPositionColor(new Vector3(-1, -1, 0), Color.Black);
             verts[31] = new VertexPositionColor(new Vector3(1, -1, 0), Color.Black);
             verts[32] = new VertexPositionColor(new Vector3(1, -1, -4), Color.Black);
@@ -105,32 +123,55 @@ namespace GeometryDrawer
             verts[34] = new VertexPositionColor(new Vector3(1, -1, -4), Color.Black);
             verts[35] = new VertexPositionColor(new Vector3(-1, -1, -4), Color.Black);
 
+            // HÉLICE
+            hVerts = new VertexPositionColor[6];
+            hVerts[0] = new VertexPositionColor(new Vector3(0, 0.15f, 0), Color.Brown);
+            hVerts[1] = new VertexPositionColor(new Vector3(1, 0.15f, 0), Color.Brown);
+            hVerts[2] = new VertexPositionColor(new Vector3(1, -0.15f, 0), Color.Brown);
+            hVerts[3] = new VertexPositionColor(new Vector3(1, -0.15f, 0), Color.Brown);
+            hVerts[4] = new VertexPositionColor(new Vector3(0, -0.15f, 0), Color.Brown);
+            hVerts[5] = new VertexPositionColor(new Vector3(0, 0.15f, 0), Color.Brown);
         }
 
-        private void CreateBuffer()
+        private void CreateBuffers()
         {
-            _vertexBuffer = new VertexBuffer(
-                _graphicsDevice,
-                typeof(VertexPositionColor),
-                verts.Length,
-                BufferUsage.None
-            );
+            _vertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionColor), verts.Length, BufferUsage.None);
             _vertexBuffer.SetData(verts);
+
+            _hVertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionColor), hVerts.Length, BufferUsage.None);
+            _hVertexBuffer.SetData(hVerts);
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            for (int i = 0; i < _helixRotations.Count; i++)
+            {
+                _helixRotations[i] += _helixRotationSpeeds[i] * delta;
+                if (_helixRotations[i] > MathHelper.TwoPi) _helixRotations[i] -= MathHelper.TwoPi;
+            }
         }
 
         public void Draw(BasicEffect effect)
         {
-            // DESENHO DOS VÉRTICES ARMAZENADOS NO BUFFER USANDO EFEITOS
-            _graphicsDevice.SetVertexBuffer(_vertexBuffer);
-
             effect.World = _world;
-
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                _graphicsDevice.DrawPrimitives(
-                    PrimitiveType.TriangleList, 0, verts.Length / 3
-                );
+                _graphicsDevice.SetVertexBuffer(_vertexBuffer);
+                _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, verts.Length / 3);
+            }
+
+            for (int i = 0; i < _helixWorlds.Count; i++)
+            {
+                Matrix rotationZ = Matrix.CreateRotationZ(_helixRotations[i]);
+                effect.World = rotationZ * _helixWorlds[i] * _world;
+                foreach (var pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    _graphicsDevice.SetVertexBuffer(_hVertexBuffer);
+                    _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, hVerts.Length / 3);
+                }
             }
         }
     }

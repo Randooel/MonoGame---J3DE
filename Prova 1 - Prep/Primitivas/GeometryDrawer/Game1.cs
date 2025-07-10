@@ -72,8 +72,25 @@ namespace GeometryDrawer
 
             _planes[0].SetPlaneInitialPos(new Vector3(1, -1, 1), 0f, 1f);
 
+            // MOINHO 1
             _windmills[0].SetWindmillInitialPos(new Vector3(-3, -1, -2), 45f, 1f);
+            // HÉLICES
+            float helixDistance = 0.1f;
+            float helixHeight = 1f;
+            _windmills[0].AddHelixInitialPos(new Vector3(helixDistance, helixHeight, 0.5f), 0f, 0f, 1f);
+            _windmills[0].AddHelixInitialPos(new Vector3(0, helixDistance + helixHeight, 0.5f), 0f, 90f, 1f);
+            _windmills[0].AddHelixInitialPos(new Vector3(-helixDistance, helixHeight, 0.5f), 0f, 180f, 1f);
+            _windmills[0].AddHelixInitialPos(new Vector3(0, -helixDistance + helixHeight, 0.5f), 0f, 270f, 1f);
+
+            // MOINHO2
             _windmills[1].SetWindmillInitialPos(new Vector3(6, -1, -2), -45f, 1f);
+            // HÉLICES
+            float helixDistance2 = 0.1f;
+            float helixHeight2 = 1f;
+            _windmills[1].AddHelixInitialPos(new Vector3(helixDistance2, helixHeight2, 0.5f), 0f, 0f, 1f);
+            _windmills[1].AddHelixInitialPos(new Vector3(0, helixDistance2 + helixHeight2, 0.5f), 0f, 90f, 1f);
+            _windmills[1].AddHelixInitialPos(new Vector3(-helixDistance2, helixHeight2, 0.5f), 0f, 180f, 1f);
+            _windmills[1].AddHelixInitialPos(new Vector3(0, -helixDistance2 + helixHeight2, 0.5f), 0f, 270f, 1f);
         }
 
         protected override void Update(GameTime gameTime)
@@ -83,7 +100,10 @@ namespace GeometryDrawer
 
             MoveCamera(gameTime);
 
-            
+            foreach(var windmill in _windmills)
+            {
+                windmill.Update(gameTime);
+            }
 
             // ROTAÇÃO MUNDO
             // Girar mundo no eixo Y
@@ -156,7 +176,6 @@ namespace GeometryDrawer
             {
                 windmill.Draw(effect);
             }
-            
 
                 base.Draw(gameTime);
         }
