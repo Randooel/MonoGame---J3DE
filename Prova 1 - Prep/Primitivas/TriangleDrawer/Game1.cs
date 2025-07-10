@@ -64,13 +64,25 @@ namespace TriangleDrawer
             // Define a quantidade de vértices que serão desenhados
             verts = new VertexPositionColor[36 + 6];
 
+            
             CubeVerts();
             PlaneVerts();
+
+            //TriangleVerts();
 
             // INSTANCIAÇÃO DO BUFFER E PASSAR A GEOMETRIA PARA ELE
             vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(
                 VertexPositionColor), verts.Length, BufferUsage.None);
             vertexBuffer.SetData<VertexPositionColor>(verts);
+        }
+
+        void TriangleVerts()
+        {
+            verts = new VertexPositionColor[3];
+
+            verts[0] = new VertexPositionColor(new Vector3(0, 1, 0), Color.Red); // Define posição e cor do vértice
+            verts[1] = new VertexPositionColor(new Vector3(1, -1, 0), Color.Green); // " "
+            verts[2] = new VertexPositionColor(new Vector3(-1, -1, 0), Color.Purple);
         }
 
         void CubeVerts()
