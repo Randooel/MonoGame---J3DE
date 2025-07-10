@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MundoUm.Content;
 
 namespace MundoUm
 {
@@ -9,7 +10,8 @@ namespace MundoUm
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        VertexPositionColor[] verts;
+        Triangle triangle;
+
         VertexBuffer vertexBuffer;
         Matrix world;
         Matrix view;
@@ -26,14 +28,18 @@ namespace MundoUm
 
         protected override void Initialize()
         {
+            //triangle = new Triangle(0,1,0);
+
             world = Matrix.Identity;
             view = Matrix.CreateLookAt(new Vector3(0, 0, 5), Vector3.Zero, Vector3.Up);
             projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, Window.ClientBounds.Width / (float)Window.ClientBounds.Height, 1, 100);
 
+            
             verts = new VertexPositionColor[3];
             verts[0] = new VertexPositionColor(new Vector3(0, 1, 0), Color.Red);
             verts[1] = new VertexPositionColor(new Vector3(1, -1, 0), Color.Blue);
             verts[2] = new VertexPositionColor(new Vector3(-1, -1, 0), Color.Yellow);
+            
 
             vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPositionColor), verts.Length, BufferUsage.None);
 
