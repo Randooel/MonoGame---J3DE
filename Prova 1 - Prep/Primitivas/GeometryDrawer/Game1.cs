@@ -14,6 +14,7 @@ namespace GeometryDrawer
         // INSTÂNCIAS DE CLASSES AQUI:
         private CubeDrawer _cubeDrawer;
         private PlaneDrawer _planeDrawer;
+        private WindmillDrawer _windmillDrawer;
 
         // MATRIZES
         private Matrix world;
@@ -39,7 +40,7 @@ namespace GeometryDrawer
         protected override void Initialize()
         {
             // INSTANCIAÇÃO DAS MATRIZES
-            world = Matrix.Identity;
+            //world = Matrix.Identity;
             view = Matrix.CreateLookAt(new Vector3(0, 0, 5), Vector3.Zero,
                 Vector3.Up);
             projection = Matrix.CreatePerspectiveFieldOfView(
@@ -58,6 +59,17 @@ namespace GeometryDrawer
             _cubeDrawer = new CubeDrawer(GraphicsDevice);
 
             _planeDrawer = new PlaneDrawer(GraphicsDevice);
+
+            _windmillDrawer = new WindmillDrawer(GraphicsDevice);
+
+            // TRANSFORMAÇÕES
+            // Definindo as posições iniciais dos objetos
+            // (posiçãoXYZ, rotaçãoY, escala)
+            _cubeDrawer.SetCubeInitialPos(new Vector3(1, -1, 1), 0f, 1f);
+
+            _planeDrawer.SetPlaneInitialPos(new Vector3(1, -1, 1), 0f, 1f);
+
+            _windmillDrawer.SetWindmillInitialPos(new Vector3(-5, -1, 1), 30f, 1f);
         }
 
         protected override void Update(GameTime gameTime)
@@ -66,6 +78,15 @@ namespace GeometryDrawer
                 Exit();
 
             MoveCamera(gameTime);
+
+            
+
+            // ROTAÇÃO MUNDO
+            // Girar mundo no eixo Y
+            //world *= Matrix.CreateRotationY(0.01f);
+
+            // Para voltar ao passo zero
+            //world = Matrix.Identity;
 
             base.Update(gameTime);
         }
@@ -107,14 +128,18 @@ namespace GeometryDrawer
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
             // MATRIZES
             effect.World = world;
             effect.View = this.view;
             effect.Projection = projection;
             effect.VertexColorEnabled = true;
 
+            // DESENHO DAS CLASSES DE OBJETOS
             _cubeDrawer.Draw(effect);
             _planeDrawer.Draw(effect);
+            _windmillDrawer.Draw(effect);
 
                 base.Draw(gameTime);
         }

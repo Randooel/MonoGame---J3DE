@@ -14,6 +14,24 @@ namespace GeometryDrawer.Content
         private VertexBuffer _vertexBuffer;
         private VertexPositionColor[] verts;
 
+        // Transforms
+        public Matrix _world = Matrix.Identity;
+
+        public void SetWorld(Matrix world)
+        {
+            _world = world;
+        }
+
+        public void SetPlaneInitialPos(Vector3 position, float rotationYDegrees, float scale)
+        {
+            Matrix planeScale = Matrix.CreateScale(scale);
+            Matrix planeRotation = Matrix.CreateRotationY(MathHelper.ToRadians(rotationYDegrees));
+            Matrix planeTranslation = Matrix.CreateTranslation(position);
+
+            Matrix planeInitialTransform = planeScale * planeRotation * planeTranslation;
+            this.SetWorld(planeInitialTransform);
+        }
+
         public PlaneDrawer(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
@@ -54,6 +72,8 @@ namespace GeometryDrawer.Content
         {
             // DESENHO DOS VÉRTICES ARMAZENADOS NO BUFFER USANDO EFEITOS
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
+
+            effect.World = _world;
 
             foreach (var pass in effect.CurrentTechnique.Passes)
             {

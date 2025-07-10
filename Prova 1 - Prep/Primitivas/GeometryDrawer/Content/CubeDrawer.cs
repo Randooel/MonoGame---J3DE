@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace GeometryDrawer.Content
 {
@@ -14,6 +15,24 @@ namespace GeometryDrawer.Content
         private GraphicsDevice _graphicsDevice;
         private VertexBuffer _vertexBuffer;
         private VertexPositionColor[] verts;
+
+        // Matrix mundo para poder aplicar rotações
+        public Matrix _world = Matrix.Identity;
+
+        public void SetWorld(Matrix world)
+        {
+            _world = world;
+        }
+
+        public void SetCubeInitialPos(Vector3 position, float rotationYDegrees, float scale)
+        {
+            Matrix cubeScale = Matrix.CreateScale(scale);
+            Matrix cubeRotation = Matrix.CreateRotationY(MathHelper.ToRadians(rotationYDegrees));
+            Matrix cubeTranslation = Matrix.CreateTranslation(position);
+
+            Matrix cubeInitialTransform = cubeScale * cubeRotation * cubeTranslation;
+            this.SetWorld(cubeInitialTransform);
+        }
 
         public CubeDrawer(GraphicsDevice graphicsDevice)
         {
@@ -103,6 +122,8 @@ namespace GeometryDrawer.Content
         {
             // DESENHO DOS VÉRTICES ARMAZENADOS NO BUFFER USANDO EFEITOS
             _graphicsDevice.SetVertexBuffer(_vertexBuffer);
+
+            effect.World = _world;
 
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
