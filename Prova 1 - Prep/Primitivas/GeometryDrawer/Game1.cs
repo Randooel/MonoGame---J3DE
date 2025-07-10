@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System;
 
 namespace GeometryDrawer
@@ -12,9 +13,9 @@ namespace GeometryDrawer
         private SpriteBatch _spriteBatch;
 
         // INSTÂNCIAS DE CLASSES AQUI:
-        private CubeDrawer _cubeDrawer;
-        private PlaneDrawer _planeDrawer;
-        private WindmillDrawer _windmillDrawer;
+        private List<CubeDrawer> _cubes = new List<CubeDrawer>();
+        private List<PlaneDrawer> _planes = new List<PlaneDrawer>();
+        private List<WindmillDrawer> _windmills = new List<WindmillDrawer>();
 
         // MATRIZES
         private Matrix world;
@@ -56,20 +57,23 @@ namespace GeometryDrawer
 
             effect = new BasicEffect(GraphicsDevice);
 
-            _cubeDrawer = new CubeDrawer(GraphicsDevice);
+            _cubes.Add(new CubeDrawer(GraphicsDevice));
 
-            _planeDrawer = new PlaneDrawer(GraphicsDevice);
+            _planes.Add(new PlaneDrawer(GraphicsDevice));
 
-            _windmillDrawer = new WindmillDrawer(GraphicsDevice);
+            _windmills.Add(new WindmillDrawer(GraphicsDevice));
+            _windmills.Add(new WindmillDrawer(GraphicsDevice));
+
 
             // TRANSFORMAÇÕES
             // Definindo as posições iniciais dos objetos
             // (posiçãoXYZ, rotaçãoY, escala)
-            _cubeDrawer.SetCubeInitialPos(new Vector3(1, -1, 1), 0f, 1f);
+            _cubes[0].SetCubeInitialPos(new Vector3(1, -1, 1), 0f, 1f);
 
-            _planeDrawer.SetPlaneInitialPos(new Vector3(1, -1, 1), 0f, 1f);
+            _planes[0].SetPlaneInitialPos(new Vector3(1, -1, 1), 0f, 1f);
 
-            _windmillDrawer.SetWindmillInitialPos(new Vector3(-5, -1, 1), 30f, 1f);
+            _windmills[0].SetWindmillInitialPos(new Vector3(-3, -1, -2), 45f, 1f);
+            _windmills[1].SetWindmillInitialPos(new Vector3(6, -1, -2), -45f, 1f);
         }
 
         protected override void Update(GameTime gameTime)
@@ -137,9 +141,22 @@ namespace GeometryDrawer
             effect.VertexColorEnabled = true;
 
             // DESENHO DAS CLASSES DE OBJETOS
-            _cubeDrawer.Draw(effect);
-            _planeDrawer.Draw(effect);
-            _windmillDrawer.Draw(effect);
+
+            foreach(var cube in _cubes)
+            {
+                cube.Draw(effect);
+            }
+
+            foreach (var plane in _planes)
+            {
+                plane.Draw(effect);
+            }
+
+            foreach (var windmill in _windmills)
+            {
+                windmill.Draw(effect);
+            }
+            
 
                 base.Draw(gameTime);
         }
