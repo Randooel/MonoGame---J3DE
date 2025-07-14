@@ -1,0 +1,42 @@
+DETALHES DA PROVA
+
+CENÁRIO E PERSONAGENS:
+- Fazer 1 mundo com 1 bar (este deve ter uma porta que mostra o lado de dentro e uma identificação em cima escrito "Bar" (este pode ser por textura ou modelo 3D))
+- Garçom Steve do Minecraft +
+- Mesa "redonda" ou parecida, com 2 copos em cima de uma bandeja 
+					(AMBOS FORA DO BAR)
+- Copos estão recebendo chuva, o que os faz encher
+- 25 BARES EM UM GRID 5X5
+
+FUNCIONALIDADE:
+- O garçom, deve começar de um extremo do mundo e, quando o copo estiver cheio, o garçom deve ir até o copo, pegá-lo no braço e levar até o outro extremo.
+
+EXTRAS:
+- Implementar texturas em tudo
+
+IMPLEMENTAÇÃO:
+Modelos
+- Chão [x]
+- Bar [x]
+- Blocagem Garçom [x]
+- Blocagem Mesa [x]
+- Blocagem Copo (x2) [x]
+
+Programação
+- Copo encherem com tempo [X]
+	- Se possível, inserir interlos aleatórios [NÃO]
+
+
+(PC travou por aproximadamente 70 minutos no total, sendo 40 no começo e nos 30 min finais)
+
+
+- Fazer o garçom se mover até à mesa e depois até a próxima extremidade []
+- Criar máquina de estado (ou emular uma) para o garçom ir até o copo apenas quando este estiver cheio []
+- Garçom colidir com copo e pegar ele []
+	(mudar a posição do copo até onde seria o braço do garçom e ir seguir reto)
+
+ENTREGÁVEL:
+- Uma pasta com o nome da matéria [X]
+	- Projeto todo (pode estar zipado) [X]
+	- Uma foto do mundo [X]
+	- Pasta do build (copia do debug e cola fora) [X]

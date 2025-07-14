@@ -1,0 +1,195 @@
+Colisões
+
+Definição dos objetos 3ds e suas (áreas de?) colisão
+
+// Posições dos objetos
+Vector3 posA = new Vector3(0, 0, 0);
+Vector3 posB = new Vector3(1, 0, 0);
+
+// Tamanho dos objetos (largura, altura, profundidade)
+Vector3 sizeA = new Vector3(2, 2, 2);
+Vector3 sizeB = new Vector3(2, 2, 2);
+
+// Criação das BoundingBoxes
+BoundingBox boxA = new BoundingBox(posA - sizeA / 2, posA + sizeA / 2);
+BoundingBox boxB = new BoundingBox(posB - sizeB / 2, posB + sizeB / 2);
+
+
+Testar colisão
+
+if (boxA.Intersects(boxB))
+{
+    Console.WriteLine("COLIDIU!");
+}
+else
+{
+    Console.WriteLine("NÃO COLIDIU");
+}
+
+
+Como mover o objeto para testar as colisões
+
+KeyboardState keyboard = Keyboard.GetState();
+
+if (keyboard.IsKeyDown(Keys.Right))
+    posA.X += 0.1f;
+
+if (keyboard.IsKeyDown(Keys.Left))
+    posA.X -= 0.1f;
+
+// Atualiza a caixa
+boxA = new BoundingBox(posA - sizeA / 2, posA + sizeA / 2);
+
+
+
+EXEMPLO COMPLETO DA COLISÃO NO GAME 1
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
+namespace BoundingBoxCollisionExample
+{
+    public class Game1 : Game
+    {
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
+
+        // Efeito básico para desenhar
+        private BasicEffect _effect;
+
+        // Cubos
+        private VertexBuffer _cubeBuffer;
+        private VertexPositionColor[] _cubeVertices;
+
+        // Posições
+        private Vector3 posA = new Vector3(0, 0, 0);
+        private Vector3 posB = new Vector3(3, 0, 0);
+
+        // Tamanhos
+        private Vector3 size = new Vector3(2, 2, 2);
+
+        // Câmera
+        private Matrix view;
+        private Matrix projection;
+
+        public Game1()
+        {
+            _graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+        }
+
+        protected override void Initialize()
+        {
+            view = Matrix.CreateLookAt(new Vector3(0, 0, 10), Vector3.Zero, Vector3.Up);
+            projection = Matrix.CreatePerspectiveFieldOfView(
+                MathHelper.PiOver4,
+                GraphicsDevice.Viewport.AspectRatio,
+                0.1f,
+                100f
+            );
+
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _effect = new BasicEffect(GraphicsDevice)
+            {
+                VertexColorEnabled = true,
+                View = view,
+                Projection = projection
+            };
+
+            CreateCube();
+        }
+
+        void CreateCube()
+        {
+            // Um cubo unitário
+            _cubeVertices = new VertexPositionColor[]
+            {
+                // Frente
+                new VertexPositionColor(new Vector3(-1,  1, -1), Color.Red),
+                new VertexPositionColor(new Vector3( 1,  1, -1), Color.Red),
+                new VertexPositionColor(new Vector3( 1, -1, -1), Color.Red),
+                new VertexPositionColor(new Vector3(-1, -1, -1), Color.Red),
+
+                // Trás
+                new VertexPositionColor(new Vector3(-1,  1, 1), Color.Blue),
+                new VertexPositionColor(new Vector3( 1,  1, 1), Color.Blue),
+                new VertexPositionColor(new Vector3( 1, -1, 1), Color.Blue),
+                new VertexPositionColor(new Vector3(-1, -1, 1), Color.Blue),
+            };
+
+            short[] indices = new short[]
+            {
+                // Frente
+                0, 1, 2, 2, 3, 0,
+                // Direita
+                1, 5, 6, 6, 2, 1,
+                // Trás
+                5, 4, 7, 7, 6, 5,
+                // Esquerda
+                4, 0, 3, 3, 7, 4,
+                // Topo
+                4, 5, 1, 1, 0, 4,
+                // Base
+                3, 2, 6, 6, 7, 3,
+            };
+
+            _cubeBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPositionColor), _cubeVertices.Length, BufferUsage.WriteOnly);
+            _cubeBuffer.SetData(_cubeVertices);
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+            KeyboardState key = Keyboard.GetState();
+
+            // Move cubo B com setas
+            if (key.IsKeyDown(Keys.Left))
+                posB.X -= 0.1f;
+            if (key.IsKeyDown(Keys.Right))
+                posB.X += 0.1f;
+            if (key.IsKeyDown(Keys.Up))
+                posB.Y += 0.1f;
+            if (key.IsKeyDown(Keys.Down))
+                posB.Y -= 0.1f;
+
+            // Criar bounding boxes
+            BoundingBox boxA = new BoundingBox(posA - size / 2, posA + size / 2);
+            BoundingBox boxB = new BoundingBox(posB - size / 2, posB + size / 2);
+
+            // Verificar colisão
+            if (boxA.Intersects(boxB))
+                System.Diagnostics.Debug.WriteLine("COLIDIU!");
+            else
+                System.Diagnostics.Debug.WriteLine("SEM COLISÃO");
+
+            base.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            _effect.CurrentTechnique.Passes[0].Apply();
+
+            // Desenha cubo A
+            _effect.World = Matrix.CreateScale(size) * Matrix.CreateTranslation(posA);
+            _effect.CurrentTechnique.Passes[0].Apply();
+            GraphicsDevice.SetVertexBuffer(_cubeBuffer);
+            GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
+
+            // Desenha cubo B
+            _effect.World = Matrix.CreateScale(size) * Matrix.CreateTranslation(posB);
+            _effect.CurrentTechnique.Passes[0].Apply();
+            GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
+
+            base.Draw(gameTime);
+        }
+    }
+}
+

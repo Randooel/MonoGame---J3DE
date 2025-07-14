@@ -1,0 +1,47 @@
+Textura e coordenada de textura
+
+(Voltando ao exemplo das aulas anteriores, façam as seguintes alterações e inclusões)
+
+1- Mude a estrutura para armazenar vértices com coordenadas UV:
+
+VertexPositionTexture[] verts;
+
+2- Declare uma textura:
+
+Texture2D texture;
+
+3- Altere a geometria para comportar as coordenadas de textura:
+
+verts = new VertexPositionTexture[3]
+verts[0] = new VertexPositionTexture(new Vector3(0, 1, 0), new Vector2(0.5f, 0));
+verts[1] = new VertexPositionTexture(new Vector3(1, -1, 0), new Vector2(0, 1));
+verts[2] = new VertexPositionTexture(new Vector3(-1, -1, 0), new Vector2(1, 1));
+
+4- Altere o buffer e a passagem de geometria para ele, visando comportar as coordenadas de textura:
+
+vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPositionTexture), verts.Length, BufferUsage.None);
+
+vertexBuffer.SetData<VertexPositionTexture>(verts);
+
+5- Instancia a textura: (Na função LoadContent())
+
+texture = Content.Load<Texture2D>(@"Textures\name");
+
+*Crie uma pasta Textures no projeto Content e insira sua textura nela
+
+6- Faça as alterações abaixo na função Draw:
+
+Comente ou apague a linha abaixo
+// effect.VertexColorEnabled = true;
+
+Insira:
+effect.TextureEnabled = true;
+effect.Text = texture;
+
+Altere:
+GraphicsDevide.DrawUserPrimitives<VertexPositionTexture>(PrimitiveType.TriangleStrip, verts, 0, 1);
+
+Execute o programa e veja o resultado!
+
+*Em caso de texture que não seja potência de 2, use:
+GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;

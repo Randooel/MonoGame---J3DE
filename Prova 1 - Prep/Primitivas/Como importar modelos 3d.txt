@@ -1,0 +1,51 @@
+Implementação de modelo 3d
+
+1- Crie uma variável para controlar posição, velocidade e ângulo
+
+Model model;
+Matrix modelMatrix;
+Vector3 modelPos, modelScale;
+float modelAngleY;
+
+2- Defina os valores das variáveis na função Initialize:
+
+modelMatrix = Matrix.Identity;
+modelPos = new Vector3(0, 0, 5);
+modelScale = new Vector3(0.1f);
+modelAngleY = 180;
+
+3- Crie uma pasta Models no projeto Content e adicione o modelo
+
+4- Crie o código para carregar o modelo na função LoadContent:
+
+model = Content.Load<Model>(@"Models\NOMEDOARQUIVO");
+
+5- Coloque uma linha de código na função Update para ver o modelo girando
+
+modelAngleY += speedR * gameTime.ElapsedGameTime.Millisenconds * 0.001f;
+
+6- Atualize a matriz do modelo na função Update, para fazer os ajustes:
+
+modelMatrix = Matrix.Identity;
+modelMatrix *= Matrix.CreateScale(modelScale);
+modelMatrix *= Matrix.CreateRotationY(MathHelper.ToRadians(modelAngleY));
+modelMatrix *= Matrix.CreateTranslation(modelPos);
+
+* Caso não precise fazer atualizações, esse trecho de código pode ser feito na função Initialize, logo após o passo 2.
+
+7- Crie o código para desenhar o modelo
+
+foreach(ModelMesh mesh in model.Meshes)
+{
+	foreach(BasicEffect be in mesh.Effects)
+	{
+		be.EnableDefaultLighting();
+		be.World = modelMatrix * mesh.ParentBone.Transform;
+		be.View = view;
+		be.Projection = projection;
+	}
+	
+	mesh.Draw();
+}
+
+
