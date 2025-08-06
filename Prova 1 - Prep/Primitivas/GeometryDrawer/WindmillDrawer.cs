@@ -118,24 +118,29 @@ namespace GeometryDrawer
         {
             this.indices = new short[]
             {
-                //frente
-                3,2,7,
-                2,6,7,
-                //direita
-                2,1,6,
-                1,5,6,
-                //tras
-                1,0,5,
-                0,4,5,
-                //esquerda
-                0,3,4,
-                3,7,4,
-                //cima
-                0,1,3,
-                1,2,3,
-                //baixo
-                7,6,4,
-                6,5,4
+                // Frente
+                0, 1, 2,
+                3, 4, 5,
+
+                // Traseira
+                6, 7, 8,
+                9, 10, 11,
+
+                // Topo
+                12, 13, 14,
+                15, 16, 17,
+
+                // Esquerda
+                18, 19, 20,
+                21, 22, 23,
+
+                // Direita
+                24, 25, 26,
+                27, 28, 29,
+
+                // Baixo
+                30, 31, 32,
+                33, 34, 35
             };
         }
 

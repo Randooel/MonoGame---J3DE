@@ -44,9 +44,9 @@ namespace GeometryDrawer
 
             windmill = new Windmill[]
             {
-                new Windmill(this, new Vector3(-2, 0, 0)),
+                new Windmill(this, new Vector3(-4, 0, 0)),
                 new Windmill(this, new Vector3(0,0,0)),
-                new Windmill(this, new Vector3(2,0,0)),
+                new Windmill(this, new Vector3(4,0,0)),
             };
 
             base.Initialize();

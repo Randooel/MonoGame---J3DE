@@ -90,6 +90,7 @@ namespace GeometryDrawer
             this.iBuffer.SetData<short>(this.indices);
         }
 
+        // Matrix _base faz se posicionar em relação à essa matriz
         public void Update(GameTime gameTime, Matrix _base)
         {
             this.rotation.Y += gameTime.ElapsedGameTime.Milliseconds * 0.001f;
