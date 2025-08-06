@@ -45,7 +45,7 @@ namespace GeometryDrawer.Content
         {
             verts = new VertexPositionColor[36];
             // IPC: Caso algum triângulo esteja com a normal errada pra consertar é muito
-            // simples - basta trocar a posição e cor do primeiro e último vértice e...... (<- qtd de pontos pra indicar o tamanho da tela divida)
+            // simples - basta trocar a posição e cor do primeiro e último vértice e...... (<- qtd de pontos pra indicar o tamanho da tela dividida)
             // VOILÀ
 
             //FRENTE DO CUBO

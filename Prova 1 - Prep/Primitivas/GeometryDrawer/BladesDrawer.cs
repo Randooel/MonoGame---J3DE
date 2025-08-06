@@ -45,13 +45,26 @@ namespace GeometryDrawer
 
         private void CreateVertex()
         {
-            verts = new VertexPositionColor[6];
-            verts[0] = new VertexPositionColor(new Vector3(0, 0.15f, 0), Color.Brown);
-            verts[1] = new VertexPositionColor(new Vector3(1, 0.15f, 0), Color.Brown);
-            verts[2] = new VertexPositionColor(new Vector3(1, -0.15f, 0), Color.Brown);
-            verts[3] = new VertexPositionColor(new Vector3(1, -0.15f, 0), Color.Brown);
-            verts[4] = new VertexPositionColor(new Vector3(0, -0.15f, 0), Color.Brown);
-            verts[5] = new VertexPositionColor(new Vector3(0, 0.15f, 0), Color.Brown);
+            verts = new VertexPositionColor[8];
+            // CIMA
+            // Cima esqeurda
+            verts[0] = new VertexPositionColor(new Vector3(-0.2f, 2.05f, 0), Color.Brown);
+            // Cima direita
+            verts[1] = new VertexPositionColor(new Vector3(0.2f, 2.05f, 0), Color.Brown);
+            // Baixo direita
+            verts[2] = new VertexPositionColor(new Vector3(0.2f, 0.05f, 0), Color.Brown);
+            // Baixo esquerda
+            verts[3] = new VertexPositionColor(new Vector3(-0.2f, 0.05f, 0), Color.Brown);
+
+            //BAIXO
+            // Cima esqeurda
+            verts[4] = new VertexPositionColor(new Vector3(-0.2f, -0.05f, 0), Color.Brown);
+            // Cima direita
+            verts[5] = new VertexPositionColor(new Vector3(0.2f, -0.05f, 0), Color.Brown);
+            // Baixo direita
+            verts[6] = new VertexPositionColor(new Vector3(0.2f, -2.05f, 0), Color.Brown);
+            // Baixo esquerda
+            verts[7] = new VertexPositionColor(new Vector3(-0.2f, -2.05f, 0), Color.Brown);
         }
 
         private void CreateVertexBuffer()
@@ -67,17 +80,10 @@ namespace GeometryDrawer
         {
             this.indices = new short[]
             {
-                //frente
-                6,5,0,
-
-                //direita
-                4,3,0,
-
-                //tras
-                2,1,0,
-
-                //esquerda
-                8,7,0,
+                0,1,2,
+                0,2,3,
+                4,5,6,
+                4,6,7
 
             };
         }
@@ -93,10 +99,10 @@ namespace GeometryDrawer
         // Matrix _base faz se posicionar em relação à essa matriz
         public void Update(GameTime gameTime, Matrix _base)
         {
-            this.rotation.Y += gameTime.ElapsedGameTime.Milliseconds * 0.001f;
+            this.rotation.Z += gameTime.ElapsedGameTime.Milliseconds * 0.001f;
 
             this.world = Matrix.Identity;
-            this.world *= Matrix.CreateRotationY(this.rotation.Y);
+            this.world *= Matrix.CreateRotationZ(this.rotation.Z);
             this.world *= Matrix.CreateTranslation(this.position);
             this.world *= _base;
         }

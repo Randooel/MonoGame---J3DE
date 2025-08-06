@@ -84,7 +84,10 @@ namespace GeometryDrawer
             camera.Update(gameTime);
 
             // Update do Moinho
-            
+            foreach(var wind in windmill)
+            {
+                wind.Update(gameTime);
+            }
 
             // ROTAÇÃO MUNDO
             // Girar mundo no eixo Y
@@ -100,7 +103,7 @@ namespace GeometryDrawer
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             effect.View = camera.GetView();
             effect.Projection = camera.GetProjection();
