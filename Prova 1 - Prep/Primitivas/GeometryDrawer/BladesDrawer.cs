@@ -23,17 +23,19 @@ namespace GeometryDrawer
         Vector3 position, scale, rotation;
         BasicEffect effect;
 
-        public BladesDrawer(Game game)
+        public BladesDrawer(Game game, Vector3 initialPos, Vector3 initialRot)
         {
             this.game = game;
 
             // posição inicial
-            this.position = new Vector3(0, 1.5f, 0);
+            this.position = initialPos/*new Vector3(0, 1.5f, 0)*/;
+            this.rotation = initialRot;
 
             // atribuição de matriz que representa as transformações desse objeto (zerada)
             this.world = Matrix.Identity;
             // aplica a transformação na posição da matriz
             this.world *= Matrix.CreateTranslation(this.position);
+            this.world *= Matrix.CreateRotationZ(this.rotation.Z);
 
             this.effect = new BasicEffect(this.game.GraphicsDevice);
 
@@ -55,16 +57,6 @@ namespace GeometryDrawer
             verts[2] = new VertexPositionColor(new Vector3(0.2f, 0.05f, 0), Color.Brown);
             // Baixo esquerda
             verts[3] = new VertexPositionColor(new Vector3(-0.2f, 0.05f, 0), Color.Brown);
-
-            //BAIXO
-            // Cima esqeurda
-            verts[4] = new VertexPositionColor(new Vector3(-0.2f, -0.05f, 0), Color.Brown);
-            // Cima direita
-            verts[5] = new VertexPositionColor(new Vector3(0.2f, -0.05f, 0), Color.Brown);
-            // Baixo direita
-            verts[6] = new VertexPositionColor(new Vector3(0.2f, -2.05f, 0), Color.Brown);
-            // Baixo esquerda
-            verts[7] = new VertexPositionColor(new Vector3(-0.2f, -2.05f, 0), Color.Brown);
         }
 
         private void CreateVertexBuffer()
@@ -84,8 +76,15 @@ namespace GeometryDrawer
                 0,2,3,
                 4,5,6,
                 4,6,7
-
             };
+        }
+
+        private void CreateMoreBlades(int bladesNumber)
+        {
+            for(int i = 0; i < bladesNumber; i++)
+            {
+                // int v = this.indices.Count--;
+            }
         }
         private void CreateIndexBuffer()
         {
