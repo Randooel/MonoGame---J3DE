@@ -23,19 +23,21 @@ namespace GeometryDrawer
         Vector3 position, scale, rotation;
         BasicEffect effect;
 
-        public BladesDrawer(Game game, Vector3 initialPos, Vector3 initialRot)
+        public BladesDrawer(Game game, Vector3 initialPos, Vector3 initialRot, Vector3 initialSca)
         {
             this.game = game;
 
             // posição inicial
             this.position = initialPos/*new Vector3(0, 1.5f, 0)*/;
             this.rotation = initialRot;
+            this.scale = initialSca;
 
             // atribuição de matriz que representa as transformações desse objeto (zerada)
             this.world = Matrix.Identity;
             // aplica a transformação na posição da matriz
             this.world *= Matrix.CreateTranslation(this.position);
             this.world *= Matrix.CreateRotationZ(this.rotation.Z);
+            this.world *= Matrix.CreateScale(this.scale);
 
             this.effect = new BasicEffect(this.game.GraphicsDevice);
 
@@ -79,13 +81,6 @@ namespace GeometryDrawer
             };
         }
 
-        private void CreateMoreBlades(int bladesNumber)
-        {
-            for(int i = 0; i < bladesNumber; i++)
-            {
-                // int v = this.indices.Count--;
-            }
-        }
         private void CreateIndexBuffer()
         {
             this.iBuffer = new IndexBuffer(this.game.GraphicsDevice,

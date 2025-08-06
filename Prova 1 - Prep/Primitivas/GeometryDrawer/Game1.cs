@@ -40,13 +40,31 @@ namespace GeometryDrawer
         protected override void Initialize()
         {
             this.camera = new Camera();
-            this.camera.SetupView(new Vector3(0f,2f,10f), new Vector3(0, 0, 0), Vector3.Up);
+            this.camera.SetupView(new Vector3(0f,2f,10f), new Vector3(0f,0f,0f), Vector3.Up);
 
             windmill = new Windmill[]
             {
-                new Windmill(this, new Vector3(-4, 0, 0), 3),
-                new Windmill(this, new Vector3(0,0,0), 4),
-                new Windmill(this, new Vector3(4,0,0), 1),
+                //                  position                        rotation Y            scale       
+                new Windmill(this, new Vector3(-4f,0f,-3f), new Vector3(0f,1f,0f) ,new Vector3(1f,1f,1f), 
+                // blade number,    blade scale
+                    4, new Vector3(1f,1f,1f)),
+
+                new Windmill(this, new Vector3(4f,0f,-3f), new Vector3(0f,-1f,0f), new Vector3(1f,1f,1f),
+                    4, new Vector3(2f,2f,2f)),
+
+                /*
+                new Windmill(this, new Vector3(0f,0f,0f), new Vector3(0f,0f,0f), new Vector3(2f,1f,1f), 
+                    4, new Vector3(1f,1f,1f)),
+
+                new Windmill(this, new Vector3(4f,0f,0f), new Vector3(0f,0f,0f), new Vector3(1f,2f,1f), 
+                    7, new Vector3(1f,1f,1f)),
+
+                new Windmill(this, new Vector3(8f,0f,0f), new Vector3(0f,0f,0f), new Vector3(1f, 1f,2f), 
+                    7, new Vector3(1f,1f,1f)),
+
+                new Windmill(this, new Vector3(12f,0f,0f), new Vector3(0f,0f,0f), new Vector3(2f,2f,2f), 
+                    10, new Vector3(1f,1f,1f)),
+                */
             };
 
             base.Initialize();
@@ -66,9 +84,9 @@ namespace GeometryDrawer
             // TRANSFORMAÇÕES
             // Definindo as posições iniciais dos objetos
             // (posiçãoXYZ, rotaçãoY, escala)
-            _cubes[0].SetCubeInitialPos(new Vector3(1, -1, 1), 0f, 1f);
+            _cubes[0].SetCubeInitialPos(new Vector3(0, 0, 0), 0f, 1f);
 
-            _planes[0].SetPlaneInitialPos(new Vector3(1, -1, 1), 0f, 1f);
+            _planes[0].SetPlaneInitialPos(new Vector3(0, 0, 0), 0f, 1f);
 
         }
 

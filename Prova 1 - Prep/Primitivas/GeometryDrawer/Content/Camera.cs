@@ -119,6 +119,14 @@ namespace GeometryDrawer
                 this.position.X += (float)Math.Sin(MathHelper.ToRadians(this.angleY - 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.speed;
                 this.position.Z += (float)Math.Cos(MathHelper.ToRadians(this.angleY - 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.speed;
             }
+            if(Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                this.position.Y -= (float)Math.Sin(MathHelper.ToRadians(this.angleY - 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.speed;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.LeftControl))
+            {
+                this.position.Y += (float)Math.Sin(MathHelper.ToRadians(this.angleY - 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.speed;
+            }
         }
     }
 }
