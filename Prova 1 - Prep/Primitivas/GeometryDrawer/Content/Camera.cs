@@ -20,6 +20,7 @@ namespace GeometryDrawer
         float speed = 10;
 
         float angleY = 0;
+        float angleX = 0;
         float speedY = 100;
 
         public Camera()
@@ -67,6 +68,7 @@ namespace GeometryDrawer
 
             this.view = Matrix.Identity;
             this.view *= Matrix.CreateRotationY(MathHelper.ToRadians(this.angleY));
+            this.view *= Matrix.CreateRotationX(MathHelper.ToRadians(this.angleX));
             this.view *= Matrix.CreateTranslation(this.position);
             this.view = Matrix.Invert(this.view);
         }
@@ -80,6 +82,15 @@ namespace GeometryDrawer
             if (Keyboard.GetState().IsKeyDown(Keys.E))
             {
                 this.angleY -= this.speedY * gameTime.ElapsedGameTime.Milliseconds * 0.001f;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.R))
+            {
+                // Como quero que rotacione na mesma velocidade que o eixo Y, reaproveitei a variável speedY
+                this.angleX -= this.speedY * gameTime.ElapsedGameTime.Milliseconds * 0.001f;
+            }
+            if(Keyboard.GetState().IsKeyDown(Keys.F))
+            {
+                this.angleX += this.speedY * gameTime.ElapsedGameTime.Milliseconds * 0.001f;
             }
         }
 

@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
+using Microsoft.Xna.Framework.Media;
+
 
 namespace GeometryDrawer
 {
@@ -17,10 +19,8 @@ namespace GeometryDrawer
         private List<PlaneDrawer> _planes = new List<PlaneDrawer>();
         private List<WindmillDrawer> _windmills = new List<WindmillDrawer>();
 
-        // MATRIZES
-        private Matrix world;
-        private Matrix view;
-        private Matrix projection;
+        // CÂMERA
+        Camera camera;
 
         // EFFECT
         private BasicEffect effect;
@@ -30,18 +30,17 @@ namespace GeometryDrawer
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            // Definindo a resolução da tela
+            Screen.GetInstance().SetWidth(_graphics.PreferredBackBufferWidth = 800);
+            Screen.GetInstance().SetHeight(_graphics.PreferredBackBufferHeight = 600);
         }
 
         protected override void Initialize()
         {
-            // INSTANCIAÇÃO DAS MATRIZES
-            //world = Matrix.Identity;
-            view = Matrix.CreateLookAt(new Vector3(0, 0, 5), Vector3.Zero,
-                Vector3.Up);
-            projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.PiOver4, Window.ClientBounds.Width /
-                (float)Window.ClientBounds.Height, 1, 100);
-
+            this.camera = new Camera();
+            this.camera.SetupView(new Vector3(1,0,0), new Vector3(0, 1, 0), new Vector3(0, 1, 0));
+            
             base.Initialize();
         }
 
@@ -91,7 +90,15 @@ namespace GeometryDrawer
         {
             // COLA: Time.deltaTime = gameTime.ElapsedGameTime.TotalSeconds
 
-            foreach(var windmill in _windmills)
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+                Keyboard.GetState().IsKeyDown(Keys.Escape))
+                this.Exit();
+
+            // Update da câmera
+            camera.Update(gameTime);
+
+            // Update do Moinho
+            foreach (var windmill in _windmills)
             {
                 windmill.Update(gameTime);
             }
@@ -112,10 +119,10 @@ namespace GeometryDrawer
 
             //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
+            effect.View = camera.GetView();
+            effect.Projection = camera.GetProjection();
+
             // MATRIZES
-            effect.World = world;
-            effect.View = this.view;
-            effect.Projection = projection;
             effect.VertexColorEnabled = true;
 
             // DESENHO DAS CLASSES DE OBJETOS
