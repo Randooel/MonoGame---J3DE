@@ -17,7 +17,8 @@ namespace GeometryDrawer
         // INSTÂNCIAS DE CLASSES AQUI:
         private List<CubeDrawer> _cubes = new List<CubeDrawer>();
         private List<PlaneDrawer> _planes = new List<PlaneDrawer>();
-        private List<WindmillDrawer> _windmills = new List<WindmillDrawer>();
+
+        Windmill[] windmill;
 
         // CÂMERA
         Camera camera;
@@ -39,8 +40,15 @@ namespace GeometryDrawer
         protected override void Initialize()
         {
             this.camera = new Camera();
-            this.camera.SetupView(new Vector3(1,0,0), new Vector3(0, 1, 0), new Vector3(0, 1, 0));
-            
+            this.camera.SetupView(new Vector3(0f,2f,10f), new Vector3(0, 0, 0), Vector3.Up);
+
+            windmill = new Windmill[]
+            {
+                new Windmill(this, new Vector3(-2, 0, 0)),
+                new Windmill(this, new Vector3(0,0,0)),
+                new Windmill(this, new Vector3(2,0,0)),
+            };
+
             base.Initialize();
         }
 
@@ -54,9 +62,6 @@ namespace GeometryDrawer
 
             _planes.Add(new PlaneDrawer(GraphicsDevice));
 
-            _windmills.Add(new WindmillDrawer(GraphicsDevice));
-            _windmills.Add(new WindmillDrawer(GraphicsDevice));
-
 
             // TRANSFORMAÇÕES
             // Definindo as posições iniciais dos objetos
@@ -65,25 +70,6 @@ namespace GeometryDrawer
 
             _planes[0].SetPlaneInitialPos(new Vector3(1, -1, 1), 0f, 1f);
 
-            // MOINHO 1
-            _windmills[0].SetWindmillInitialPos(new Vector3(-3, -1, -2), 45f, 1f);
-            // HÉLICES
-            float helixDistance = 0.1f;
-            float helixHeight = 1f;
-            _windmills[0].AddHelixInitialPos(new Vector3(helixDistance, helixHeight, 0.5f), 0f, 0f, 1f);
-            _windmills[0].AddHelixInitialPos(new Vector3(0, helixDistance + helixHeight, 0.5f), 0f, 90f, 1f);
-            _windmills[0].AddHelixInitialPos(new Vector3(-helixDistance, helixHeight, 0.5f), 0f, 180f, 1f);
-            _windmills[0].AddHelixInitialPos(new Vector3(0, -helixDistance + helixHeight, 0.5f), 0f, 270f, 1f);
-
-            // MOINHO2
-            _windmills[1].SetWindmillInitialPos(new Vector3(6, -1, -2), -45f, 1f);
-            // HÉLICES
-            float helixDistance2 = 0.1f;
-            float helixHeight2 = 1f;
-            _windmills[1].AddHelixInitialPos(new Vector3(helixDistance2, helixHeight2, 0.5f), 0f, 0f, 1f);
-            _windmills[1].AddHelixInitialPos(new Vector3(0, helixDistance2 + helixHeight2, 0.5f), 0f, 90f, 1f);
-            _windmills[1].AddHelixInitialPos(new Vector3(-helixDistance2, helixHeight2, 0.5f), 0f, 180f, 1f);
-            _windmills[1].AddHelixInitialPos(new Vector3(0, -helixDistance2 + helixHeight2, 0.5f), 0f, 270f, 1f);
         }
 
         protected override void Update(GameTime gameTime)
@@ -98,10 +84,7 @@ namespace GeometryDrawer
             camera.Update(gameTime);
 
             // Update do Moinho
-            foreach (var windmill in _windmills)
-            {
-                windmill.Update(gameTime);
-            }
+            
 
             // ROTAÇÃO MUNDO
             // Girar mundo no eixo Y
@@ -126,6 +109,10 @@ namespace GeometryDrawer
             effect.VertexColorEnabled = true;
 
             // DESENHO DAS CLASSES DE OBJETOS
+            foreach(var wind in windmill)
+            {
+                wind.Draw(this.camera);
+            }
 
             foreach(var cube in _cubes)
             {
@@ -135,11 +122,6 @@ namespace GeometryDrawer
             foreach (var plane in _planes)
             {
                 plane.Draw(effect);
-            }
-
-            foreach (var windmill in _windmills)
-            {
-                windmill.Draw(effect);
             }
 
                 base.Draw(gameTime);

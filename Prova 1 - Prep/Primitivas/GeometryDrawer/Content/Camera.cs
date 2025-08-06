@@ -38,7 +38,10 @@ namespace GeometryDrawer
 
         public void SetupView(Vector3 position, Vector3 target, Vector3 up)
         {
-            this.view = Matrix.CreateLookAt(position, target, up);
+            //this.view = Matrix.CreateLookAt(position, target, up);
+            this.position = position;
+            this.target = target;
+            this.up = up;
         }
 
         public void SetupProjection()

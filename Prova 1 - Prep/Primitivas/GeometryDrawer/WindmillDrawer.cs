@@ -7,67 +7,35 @@ namespace GeometryDrawer
 {
     public class WindmillDrawer
     {
-        private GraphicsDevice _graphicsDevice;
-
-        // Moinho
-        private VertexBuffer _vertexBuffer;
+        Game game;
         private VertexPositionColor[] verts;
+        private VertexBuffer vBuffer;
+        private short[] indices;
+        private IndexBuffer iBuffer;
+        private Matrix world;
+        private Vector3 position, scale, rotation;
+        private BasicEffect effect;
 
-        // Hélices
-        /*
-        private VertexBuffer _hVertexBuffer;
-        private VertexPositionColor[] hVerts;
-        */
-
-        // Matriz
-        private Matrix _world = Matrix.Identity;
-        private List<Matrix> _helixWorlds = new List<Matrix>();
-
-        private List<float> _helixRotations = new List<float>();
-        private List<float> _helixRotationSpeeds = new List<float>();
-        private static readonly Random _rng = new Random();
-
-        public void SetWorld(Matrix world) { _world = world; }
-
-        public void AddHelix(Matrix helixWorld)
+        public WindmillDrawer(Game game, Matrix _base)
         {
-            _helixWorlds.Add(helixWorld);
-            _helixRotations.Add(0f);
-            _helixRotationSpeeds.Add((float)(_rng.NextDouble() * 2 + 1)); // velocidade entre 1‑3 rad/s
-        }
+            this.game = game;
 
-        public void SetWindmillInitialPos(Vector3 position, float rotationYDegrees, float scale)
-        {
-            Matrix windmillScale = Matrix.CreateScale(scale);
-            Matrix windmillRotation = Matrix.CreateRotationY(MathHelper.ToRadians(rotationYDegrees));
-            Matrix windmillTranslation = Matrix.CreateTranslation(position);
+            this.world = Matrix.Identity;
+            // Permite que posicione esse objeto em relação a outro
+            this.world *= _base;
 
-            Matrix windmillInitialTransform = windmillScale * windmillRotation * windmillTranslation;
-            this.SetWorld(windmillInitialTransform);
-        }
+            this.effect = new BasicEffect(this.game.GraphicsDevice);
 
-        public void AddHelixInitialPos(Vector3 position, float rotationYDegrees, float rotationZDegrees, float scale)
-        {
-            Matrix helixScale = Matrix.CreateScale(scale);
-            Matrix helixRotation = Matrix.CreateRotationY(MathHelper.ToRadians(rotationYDegrees));
-            Matrix helixRotationZ = Matrix.CreateRotationZ(MathHelper.ToRadians(rotationZDegrees));
-            Matrix helixTranslation = Matrix.CreateTranslation(position);
-
-            Matrix helixInitialTransform = helixScale * helixRotation * helixRotationZ * helixTranslation;
-            AddHelix(helixInitialTransform);
-        }
-
-        public WindmillDrawer(GraphicsDevice graphicsDevice)
-        {
-            _graphicsDevice = graphicsDevice;
-            CreateVertices();
-            CreateBuffers();
+            this.CreateVertex();
+            this.CreateVertexBuffer();
+            this.CreateIndex();
+            this.CreateIndexBuffer();
         }
 
         // No geral, a mesma coisa com o cubo, só que com uma base traseira mais afastada
         // e topo mais alto
         // Em suma: SUBSTITUIR TODOS OS Y +1 por +4 e o Z -2 da traseira e lados por -4
-        private void CreateVertices()
+        private void CreateVertex()
         {
             verts = new VertexPositionColor[36];
 
@@ -137,50 +105,77 @@ namespace GeometryDrawer
             */
         }
 
-        private void CreateBuffers()
+        private void CreateVertexBuffer()
         {
-            _vertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionColor), verts.Length, BufferUsage.None);
-            _vertexBuffer.SetData(verts);
+            this.vBuffer = new VertexBuffer(this.game.GraphicsDevice,
+                                            typeof(VertexPositionColor),
+                                            this.verts.Length,
+                                            BufferUsage.None);
+            this.vBuffer.SetData<VertexPositionColor>(this.verts);
+        }
 
-            /*
-            _hVertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionColor), hVerts.Length, BufferUsage.None);
-            _hVertexBuffer.SetData(hVerts);
-            */
+        private void CreateIndex()
+        {
+            this.indices = new short[]
+            {
+                //frente
+                3,2,7,
+                2,6,7,
+                //direita
+                2,1,6,
+                1,5,6,
+                //tras
+                1,0,5,
+                0,4,5,
+                //esquerda
+                0,3,4,
+                3,7,4,
+                //cima
+                0,1,3,
+                1,2,3,
+                //baixo
+                7,6,4,
+                6,5,4
+            };
+        }
+
+        private void CreateIndexBuffer()
+        {
+            this.iBuffer = new IndexBuffer(this.game.GraphicsDevice,
+                                           IndexElementSize.SixteenBits,
+                                           this.indices.Length,
+                                           BufferUsage.None);
+            this.iBuffer.SetData<short>(this.indices);
         }
 
         public void Update(GameTime gameTime)
         {
-            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            for (int i = 0; i < _helixRotations.Count; i++)
-            {
-                _helixRotations[i] += _helixRotationSpeeds[i] * delta;
-                if (_helixRotations[i] > MathHelper.TwoPi) _helixRotations[i] -= MathHelper.TwoPi;
-            }
+            
         }
 
-        public void Draw(BasicEffect effect)
+        public void Draw(Camera camera)
         {
-            effect.World = _world;
-            foreach (var pass in effect.CurrentTechnique.Passes)
+            this.game.GraphicsDevice.SetVertexBuffer(this.vBuffer);
+            this.game.GraphicsDevice.Indices = this.iBuffer;
+
+            this.effect.World = this.world;
+            this.effect.View = camera.GetView();
+            this.effect.Projection = camera.GetProjection();
+            this.effect.VertexColorEnabled = true;
+
+            foreach (EffectPass pass in this.effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                _graphicsDevice.SetVertexBuffer(_vertexBuffer);
-                _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, verts.Length / 3);
-            }
 
-            /*
-            for (int i = 0; i < _helixWorlds.Count; i++)
-            {
-                Matrix rotationZ = Matrix.CreateRotationZ(_helixRotations[i]);
-                effect.World = rotationZ * _helixWorlds[i] * _world;
-                foreach (var pass in effect.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    _graphicsDevice.SetVertexBuffer(_hVertexBuffer);
-                    _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, hVerts.Length / 3);
-                }
+                this.game.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(
+                                                    PrimitiveType.TriangleList,
+                                                    this.verts,
+                                                    0,
+                                                    this.verts.Length,
+                                                    this.indices,
+                                                    0,
+                                                    this.indices.Length / 3);
             }
-            */
         }
     }
 }
