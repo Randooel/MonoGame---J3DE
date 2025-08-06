@@ -14,8 +14,10 @@ namespace GeometryDrawer
         private VertexPositionColor[] verts;
 
         // Hélices
+        /*
         private VertexBuffer _hVertexBuffer;
         private VertexPositionColor[] hVerts;
+        */
 
         // Matriz
         private Matrix _world = Matrix.Identity;
@@ -124,6 +126,7 @@ namespace GeometryDrawer
             verts[35] = new VertexPositionColor(new Vector3(-1, -1, -4), Color.Black);
 
             // HÉLICE
+            /*
             hVerts = new VertexPositionColor[6];
             hVerts[0] = new VertexPositionColor(new Vector3(0, 0.15f, 0), Color.Brown);
             hVerts[1] = new VertexPositionColor(new Vector3(1, 0.15f, 0), Color.Brown);
@@ -131,6 +134,7 @@ namespace GeometryDrawer
             hVerts[3] = new VertexPositionColor(new Vector3(1, -0.15f, 0), Color.Brown);
             hVerts[4] = new VertexPositionColor(new Vector3(0, -0.15f, 0), Color.Brown);
             hVerts[5] = new VertexPositionColor(new Vector3(0, 0.15f, 0), Color.Brown);
+            */
         }
 
         private void CreateBuffers()
@@ -138,8 +142,10 @@ namespace GeometryDrawer
             _vertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionColor), verts.Length, BufferUsage.None);
             _vertexBuffer.SetData(verts);
 
+            /*
             _hVertexBuffer = new VertexBuffer(_graphicsDevice, typeof(VertexPositionColor), hVerts.Length, BufferUsage.None);
             _hVertexBuffer.SetData(hVerts);
+            */
         }
 
         public void Update(GameTime gameTime)
@@ -162,6 +168,7 @@ namespace GeometryDrawer
                 _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, verts.Length / 3);
             }
 
+            /*
             for (int i = 0; i < _helixWorlds.Count; i++)
             {
                 Matrix rotationZ = Matrix.CreateRotationZ(_helixRotations[i]);
@@ -173,6 +180,7 @@ namespace GeometryDrawer
                     _graphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, hVerts.Length / 3);
                 }
             }
+            */
         }
     }
 }

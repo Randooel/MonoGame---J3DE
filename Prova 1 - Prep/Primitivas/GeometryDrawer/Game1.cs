@@ -25,12 +25,6 @@ namespace GeometryDrawer
         // EFFECT
         private BasicEffect effect;
 
-        // CÂMERA
-        private Vector3 cameraPosition = new Vector3(0, 0, 5);
-        private Vector3 cameraTarget = Vector3.Zero;
-        private Vector3 cameraUp = Vector3.Up;
-        private float cameraSpeed = 10f;
-
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -95,10 +89,7 @@ namespace GeometryDrawer
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            MoveCamera(gameTime);
+            // COLA: Time.deltaTime = gameTime.ElapsedGameTime.TotalSeconds
 
             foreach(var windmill in _windmills)
             {
@@ -113,39 +104,6 @@ namespace GeometryDrawer
             //world = Matrix.Identity;
 
             base.Update(gameTime);
-        }
-
-        void MoveCamera(GameTime gameTime)
-        {
-            // CÂMERA: MOVIMENTO
-            KeyboardState keyboard = Keyboard.GetState();
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            // Vetor de direção da câmera (em relação ao target)
-            Vector3 forward = Vector3.Normalize(cameraTarget - cameraPosition);
-            Vector3 right = Vector3.Normalize(Vector3.Cross(forward, cameraUp));
-
-            // Movimentos
-            if (keyboard.IsKeyDown(Keys.W))
-                cameraPosition += forward * cameraSpeed * deltaTime;
-
-            if (keyboard.IsKeyDown(Keys.S))
-                cameraPosition -= forward * cameraSpeed * deltaTime;
-
-            if (keyboard.IsKeyDown(Keys.A))
-                cameraPosition -= right * cameraSpeed * deltaTime;
-
-            if (keyboard.IsKeyDown(Keys.D))
-                cameraPosition += right * cameraSpeed * deltaTime;
-
-            if (keyboard.IsKeyDown(Keys.E))
-                cameraPosition += cameraUp * cameraSpeed * deltaTime;
-
-            if (keyboard.IsKeyDown(Keys.Q))
-                cameraPosition -= cameraUp * cameraSpeed * deltaTime;
-
-            // Atualiza a View Matrix com nova posição
-            view = Matrix.CreateLookAt(cameraPosition, cameraTarget, cameraUp);
         }
 
         protected override void Draw(GameTime gameTime)
