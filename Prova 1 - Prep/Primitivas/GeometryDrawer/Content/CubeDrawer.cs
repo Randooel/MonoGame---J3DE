@@ -1,47 +1,45 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
 
-namespace GeometryDrawer.Content
+namespace GeometryDrawer
 {
     public class CubeDrawer
     {
-        private GraphicsDevice _graphicsDevice;
-        private VertexBuffer _vertexBuffer;
+        Game game;
         private VertexPositionColor[] verts;
+        private VertexBuffer vBuffer;
+        private short[] indices;
+        private IndexBuffer iBuffer;
+        private Matrix world;
+        private Vector3 position, scale, rotation;
+        private BasicEffect effect;
 
-        // Matrix mundo para poder aplicar rotações
-        public Matrix _world = Matrix.Identity;
-
-        public void SetWorld(Matrix world)
+        public CubeDrawer(Game game, Vector3 position, Vector3 rotationY, Vector3 scale, Matrix _base)
         {
-            _world = world;
+            this.game = game;
+
+            this.rotation = rotationY;
+            this.position = position;
+            this.scale = scale;
+
+            this.world = Matrix.Identity;
+            this.world *= _base;
+
+            this.world *= Matrix.CreateScale(this.scale);
+            this.world *= Matrix.CreateRotationY(this.rotation.Y);
+            this.world *= Matrix.CreateTranslation(this.position);
+
+            this.effect = new BasicEffect(this.game.GraphicsDevice);
+
+            this.CreateVertex();
+            this.CreateVertexBuffer();
+            //this.CreateIndex();
+            //this.CreateIndexBuffer();
         }
 
-        public void SetCubeInitialPos(Vector3 position, float rotationYDegrees, float scale)
-        {
-            Matrix cubeScale = Matrix.CreateScale(scale);
-            Matrix cubeRotation = Matrix.CreateRotationY(MathHelper.ToRadians(rotationYDegrees));
-            Matrix cubeTranslation = Matrix.CreateTranslation(position);
-
-            Matrix cubeInitialTransform = cubeScale * cubeRotation * cubeTranslation;
-            this.SetWorld(cubeInitialTransform);
-        }
-
-        public CubeDrawer(GraphicsDevice graphicsDevice)
-        {
-            _graphicsDevice = graphicsDevice;
-            CreateVertices();
-            CreateBuffer();
-        }
-
-        private void CreateVertices()
+        private void CreateVertex()
         {
             verts = new VertexPositionColor[36];
             // IPC: Caso algum triângulo esteja com a normal errada pra consertar é muito
@@ -104,33 +102,36 @@ namespace GeometryDrawer.Content
             verts[33] = new VertexPositionColor(new Vector3(-1, -1, 0), Color.Red);
             verts[34] = new VertexPositionColor(new Vector3(1, -1, -2), Color.Blue);
             verts[35] = new VertexPositionColor(new Vector3(-1, -1, -2), Color.Purple);
-
         }
 
-        private void CreateBuffer()
+        private void CreateVertexBuffer()
         {
-            _vertexBuffer = new VertexBuffer(
-                _graphicsDevice,
-                typeof(VertexPositionColor),
-                verts.Length,
-                BufferUsage.None
-            );
-            _vertexBuffer.SetData(verts);
+            this.vBuffer = new VertexBuffer(this.game.GraphicsDevice,
+                                            typeof(VertexPositionColor),
+                                            this.verts.Length,
+                                            BufferUsage.None);
+            this.vBuffer.SetData<VertexPositionColor>(this.verts);
         }
 
-        public void Draw(BasicEffect effect)
+        public void Draw(Camera camera)
         {
-            // DESENHO DOS VÉRTICES ARMAZENADOS NO BUFFER USANDO EFEITOS
-            _graphicsDevice.SetVertexBuffer(_vertexBuffer);
+            this.game.GraphicsDevice.SetVertexBuffer(this.vBuffer);
+            this.game.GraphicsDevice.Indices = this.iBuffer;
 
-            effect.World = _world;
+            this.effect.World = this.world;
+            this.effect.View = camera.GetView();
+            this.effect.Projection = camera.GetProjection();
+            this.effect.VertexColorEnabled = true;
 
-            foreach (var pass in effect.CurrentTechnique.Passes)
+            foreach (EffectPass pass in this.effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                _graphicsDevice.DrawPrimitives(
-                    PrimitiveType.TriangleList, 0, verts.Length / 3
-                );
+
+                this.game.GraphicsDevice.DrawUserPrimitives<VertexPositionColor>(
+                    PrimitiveType.TriangleList,
+                    this.verts,
+                    0,
+                    this.verts.Length / 3);
             }
         }
     }

@@ -15,8 +15,8 @@ namespace GeometryDrawer
         private SpriteBatch _spriteBatch;
 
         // INSTÂNCIAS DE CLASSES AQUI:
-        private List<CubeDrawer> _cubes = new List<CubeDrawer>();
-        private List<PlaneDrawer> _planes = new List<PlaneDrawer>();
+        private CubeDrawer[] cubes;
+        private List<PlaneDrawer> planes = new List<PlaneDrawer>();
 
         Windmill[] windmill;
 
@@ -45,26 +45,32 @@ namespace GeometryDrawer
             windmill = new Windmill[]
             {
                 //                  position                        rotation Y            scale       
-                new Windmill(this, new Vector3(-4f,0f,-3f), new Vector3(0f,1f,0f) ,new Vector3(1f,1f,1f), 
+                new Windmill(this, new Vector3(-4f,0f,-3f), new Vector3(0f,1f,0f) ,new Vector3(1.05f,1.05f,1.05f), 
                 // blade number,    blade scale
                     4, new Vector3(1f,1f,1f)),
 
-                new Windmill(this, new Vector3(4f,0f,-3f), new Vector3(0f,-1f,0f), new Vector3(1f,1f,1f),
+                new Windmill(this, new Vector3(4f,0f,-3f), new Vector3(0f,-1f,0f), new Vector3(1.05f,1.05f,1.05f),
                     4, new Vector3(2f,2f,2f)),
 
                 /*
-                new Windmill(this, new Vector3(0f,0f,0f), new Vector3(0f,0f,0f), new Vector3(2f,1f,1f), 
+                new Windmill(this, new Vector3(-4f,0f,3f), new Vector3(0f,9f,0f), new Vector3(2f,1f,1f), 
                     4, new Vector3(1f,1f,1f)),
 
-                new Windmill(this, new Vector3(4f,0f,0f), new Vector3(0f,0f,0f), new Vector3(1f,2f,1f), 
+                new Windmill(this, new Vector3(4f,0f,3f), new Vector3(0f,9f,0f), new Vector3(1f,2f,1f), 
                     7, new Vector3(1f,1f,1f)),
-
+                
                 new Windmill(this, new Vector3(8f,0f,0f), new Vector3(0f,0f,0f), new Vector3(1f, 1f,2f), 
                     7, new Vector3(1f,1f,1f)),
 
                 new Windmill(this, new Vector3(12f,0f,0f), new Vector3(0f,0f,0f), new Vector3(2f,2f,2f), 
                     10, new Vector3(1f,1f,1f)),
                 */
+            };
+
+            cubes = new CubeDrawer[]
+            {
+                // position / rotation / scale / matrix pai
+                new CubeDrawer(this, new Vector3(0f,0f,3f), new Vector3(0f,0f,0f), new Vector3(1f,1f,1f), Matrix.Identity),
             };
 
             base.Initialize();
@@ -76,17 +82,9 @@ namespace GeometryDrawer
 
             effect = new BasicEffect(GraphicsDevice);
 
-            _cubes.Add(new CubeDrawer(GraphicsDevice));
+            planes.Add(new PlaneDrawer(GraphicsDevice));
 
-            _planes.Add(new PlaneDrawer(GraphicsDevice));
-
-
-            // TRANSFORMAÇÕES
-            // Definindo as posições iniciais dos objetos
-            // (posiçãoXYZ, rotaçãoY, escala)
-            _cubes[0].SetCubeInitialPos(new Vector3(0, 0, 0), 0f, 1f);
-
-            _planes[0].SetPlaneInitialPos(new Vector3(0, 0, 0), 0f, 1f);
+            planes[0].SetPlaneInitialPos(new Vector3(0, 0, 0), 0f, 1f);
 
         }
 
@@ -121,7 +119,8 @@ namespace GeometryDrawer
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            // CÓDIGO SECRETO DA VISUALIZAÇÃO ALÉM DA VISÃO
+            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             effect.View = camera.GetView();
             effect.Projection = camera.GetProjection();
@@ -135,12 +134,12 @@ namespace GeometryDrawer
                 wind.Draw(this.camera);
             }
 
-            foreach(var cube in _cubes)
+            foreach(var cube in cubes)
             {
-                cube.Draw(effect);
+                cube.Draw(this.camera);
             }
 
-            foreach (var plane in _planes)
+            foreach (var plane in planes)
             {
                 plane.Draw(effect);
             }

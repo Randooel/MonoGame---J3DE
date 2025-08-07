@@ -24,15 +24,17 @@ namespace GeometryDrawer
         public Windmill(Game game, Vector3 position, Vector3 rotation, Vector3 scale, int bladesNumber, Vector3 bladeScale)
         {
             this.game = game;
+            this.rotation = rotation;
             this.position = position;
             this.scale = scale;
-            this.rotation = rotation;
+            
 
             this.world = Matrix.Identity;
             // IPC: APLICAR ROTAÇÃO ANTES DE TRANSLADAR. SE NÃO FIZER ISSO, O  OBJETO IRÁ SE MOVR FORA DO PRÓPRIO EIXO
             this.world *= Matrix.CreateRotationY(this.rotation.Y);
-            this.world *= Matrix.CreateTranslation(this.position);
             this.world *= Matrix.CreateScale(this.scale);
+            this.world *= Matrix.CreateTranslation(this.position);
+            
             
 
             this.wind = new WindmillDrawer(this.game, this.world);
