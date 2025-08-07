@@ -20,6 +20,8 @@ namespace GeometryDrawer
 
         Windmill[] windmill;
 
+        CharacterClass character1;
+
         Vector3 currentPos = Vector3.Zero;
 
         // CÂMERA
@@ -43,6 +45,9 @@ namespace GeometryDrawer
         {
             this.camera = new Camera();
             this.camera.SetupView(new Vector3(0f,2f,10f), new Vector3(0f,0f,0f), Vector3.Up);
+            
+            // game / position / rotation / scale / state 
+            character1 = new CharacterClass(this, new Vector3(4f, 0f, 4f), new Vector3(0f, 0f, 0f), new Vector3(1f, 1f, 1f), CharacterClass.State.Idle);
 
             windmill = new Windmill[]
             {
@@ -101,6 +106,15 @@ namespace GeometryDrawer
             // Update da câmera
             camera.Update(gameTime);
 
+            // Update dos personagens
+            character1.Update(gameTime);
+
+            // Update das malhas
+            foreach(var cube in cubes)
+            {
+                cube.Update(gameTime);
+            }
+
             // Update do Moinho
             foreach(var wind in windmill)
             {
@@ -115,7 +129,7 @@ namespace GeometryDrawer
             //world = Matrix.Identity;
 
             // gameTime / speed
-            MoveGeometry(gameTime, 1);
+            //MoveGeometry(gameTime, 1);
             
 
             base.Update(gameTime);
@@ -151,6 +165,9 @@ namespace GeometryDrawer
 
             // MATRIZES
             effect.VertexColorEnabled = true;
+
+            // DESENHO DAS CLASSES DE PERSONAGEM
+            character1.Draw(camera);
 
             // DESENHO DAS CLASSES DE OBJETOS
             foreach(var wind in windmill)

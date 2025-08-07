@@ -2,10 +2,11 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Input;
 
 namespace GeometryDrawer
 {
-    public class CubeDrawer
+    public class CubeDrawer : Collider
     {
         Game game;
         private VertexPositionColor[] verts;
@@ -19,6 +20,7 @@ namespace GeometryDrawer
         public Matrix World { get => world; set => world = value; }
 
         public CubeDrawer(Game game, Vector3 position, Vector3 rotationY, Vector3 scale, Matrix _base)
+            : base(game, Vector3.Zero, Vector3.Zero, Color.Green, false)
         {
             this.game = game;
 
@@ -39,6 +41,21 @@ namespace GeometryDrawer
             this.CreateVertexBuffer();
             //this.CreateIndex();
             //this.CreateIndexBuffer();
+
+            Vector3 centerLocal = CalculateColliderCenter();
+            Vector3 dimensionLocal = CalculateColliderDimension();
+
+            // Apagar isso pro colisor ficar do tamanho exato do cubo
+            float extraScale = 1.1f;
+
+            Vector3 colliderCenter = Vector3.Transform(centerLocal, this.World);
+            Vector3 colliderDimension = dimensionLocal * scale * 1.01f;
+
+            this.SetPosition(colliderCenter);
+            this.dimension = colliderDimension;
+
+            this.UpdateBoundingBox();
+            this.lineBox = new LineBox(game, colliderCenter, colliderDimension, Color.Green);
         }
 
         private void CreateVertex()
@@ -115,10 +132,21 @@ namespace GeometryDrawer
             this.vBuffer.SetData<VertexPositionColor>(this.verts);
         }
 
+        public void Update(GameTime gameTime)
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.C))
+            {
+                this.SetVisible(true);
+            }
+            if(Keyboard.GetState().IsKeyDown(Keys.X))
+            {
+                this.SetVisible(false);
+            }
+        }
+
         public void Draw(Camera camera)
         {
             this.game.GraphicsDevice.SetVertexBuffer(this.vBuffer);
-            this.game.GraphicsDevice.Indices = this.iBuffer;
 
             this.effect.World = this.World;
             this.effect.View = camera.GetView();
@@ -135,6 +163,48 @@ namespace GeometryDrawer
                     0,
                     this.verts.Length / 3);
             }
+
+            this.DrawCollider(camera);
+        }
+
+        public void DrawCollider(Camera camera)
+        {
+            BasicEffect effect = new BasicEffect(this.game.GraphicsDevice)
+            {
+                View = camera.GetView(),
+                Projection = camera.GetProjection(),
+                VertexColorEnabled = true
+            };
+
+            base.Draw(effect);
+        }
+
+        private Vector3 CalculateColliderCenter()
+        {
+            Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+
+            foreach (var vert in verts)
+            {
+                min = Vector3.Min(min, vert.Position);
+                max = Vector3.Max(max, vert.Position);
+            }
+
+            return (min + max) / 2f;
+        }
+
+        private Vector3 CalculateColliderDimension()
+        {
+            Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+
+            foreach (var vert in verts)
+            {
+                min = Vector3.Min(min, vert.Position);
+                max = Vector3.Max(max, vert.Position);
+            }
+
+            return max - min;
         }
     }
 }
