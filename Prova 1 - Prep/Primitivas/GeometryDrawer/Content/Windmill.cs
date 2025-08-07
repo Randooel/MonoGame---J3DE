@@ -18,6 +18,8 @@ namespace GeometryDrawer
         WindmillDrawer wind;
         List<BladesDrawer> blades = new List<BladesDrawer>();
 
+        public Matrix World { get => world; set => world = value; }
+
         // OBS: Se eu só precisasse de 1 eixo de cada tranformação, poderia fazer um único Vector3 pra armazenar esses valores.
         //EX: public Windmiil(Vector3 transforms)  Inserir os valores nesse formato: new Vector3(pos, rot, sca) e, nas funções de tranformação mutiplicar os inúteis por 0 e/ou tranformar
         // no mesmo valor definido para aquele eixo  
@@ -29,15 +31,15 @@ namespace GeometryDrawer
             this.scale = scale;
             
 
-            this.world = Matrix.Identity;
+            this.World = Matrix.Identity;
             // IPC: APLICAR ROTAÇÃO ANTES DE TRANSLADAR. SE NÃO FIZER ISSO, O  OBJETO IRÁ SE MOVR FORA DO PRÓPRIO EIXO
-            this.world *= Matrix.CreateRotationY(this.rotation.Y);
-            this.world *= Matrix.CreateScale(this.scale);
-            this.world *= Matrix.CreateTranslation(this.position);
+            this.World *= Matrix.CreateRotationY(this.rotation.Y);
+            this.World *= Matrix.CreateScale(this.scale);
+            this.World *= Matrix.CreateTranslation(this.position);
             
             
 
-            this.wind = new WindmillDrawer(this.game, this.world);
+            this.wind = new WindmillDrawer(this.game, this.World);
 
             for(int i = 0; i < bladesNumber; i++)
             {
@@ -59,7 +61,7 @@ namespace GeometryDrawer
             this.wind.Update(gameTime);
             foreach(var blade in blades)
             {
-                blade.Update(gameTime, this.world);
+                blade.Update(gameTime, this.World);
             }
         }
 

@@ -20,6 +20,8 @@ namespace GeometryDrawer
 
         Windmill[] windmill;
 
+        Vector3 currentPos = Vector3.Zero;
+
         // CÂMERA
         Camera camera;
 
@@ -112,7 +114,29 @@ namespace GeometryDrawer
             // Para voltar ao passo zero
             //world = Matrix.Identity;
 
+            // gameTime / speed
+            MoveGeometry(gameTime, 1);
+            
+
             base.Update(gameTime);
+        }
+
+        private void MoveGeometry(GameTime gameTime, float speed)
+        {
+            Vector3 targetPos1 = new Vector3(0f, 4f, 0f);
+            float moveSpeed = speed;
+
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Vector3 direction = Vector3.Normalize(targetPos1 - currentPos);
+            float distance = Vector3.Distance(currentPos, targetPos1);
+
+            // Tolerância da distância
+            if (distance > 0.01f)
+            {
+                currentPos += direction * moveSpeed * dt;
+                cubes[0].World = Matrix.CreateTranslation(currentPos);
+            }            
         }
 
         protected override void Draw(GameTime gameTime)

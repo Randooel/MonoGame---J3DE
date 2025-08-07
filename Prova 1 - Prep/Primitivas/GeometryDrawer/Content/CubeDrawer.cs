@@ -16,6 +16,8 @@ namespace GeometryDrawer
         private Vector3 position, scale, rotation;
         private BasicEffect effect;
 
+        public Matrix World { get => world; set => world = value; }
+
         public CubeDrawer(Game game, Vector3 position, Vector3 rotationY, Vector3 scale, Matrix _base)
         {
             this.game = game;
@@ -24,12 +26,12 @@ namespace GeometryDrawer
             this.position = position;
             this.scale = scale;
 
-            this.world = Matrix.Identity;
-            this.world *= _base;
+            this.World = Matrix.Identity;
+            this.World *= _base;
 
-            this.world *= Matrix.CreateScale(this.scale);
-            this.world *= Matrix.CreateRotationY(this.rotation.Y);
-            this.world *= Matrix.CreateTranslation(this.position);
+            this.World *= Matrix.CreateScale(this.scale);
+            this.World *= Matrix.CreateRotationY(this.rotation.Y);
+            this.World *= Matrix.CreateTranslation(this.position);
 
             this.effect = new BasicEffect(this.game.GraphicsDevice);
 
@@ -118,7 +120,7 @@ namespace GeometryDrawer
             this.game.GraphicsDevice.SetVertexBuffer(this.vBuffer);
             this.game.GraphicsDevice.Indices = this.iBuffer;
 
-            this.effect.World = this.world;
+            this.effect.World = this.World;
             this.effect.View = camera.GetView();
             this.effect.Projection = camera.GetProjection();
             this.effect.VertexColorEnabled = true;
