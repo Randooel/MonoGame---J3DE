@@ -1,0 +1,215 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+
+namespace LAB_AV2_2025_1
+{
+    public class Game1 : Game
+    {
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
+
+        // INSTÂNCIAS DE CLASSES AQUI:
+        private CubeDrawer[] cubes;
+        private List<PlaneDrawer> planes = new List<PlaneDrawer>();
+
+        Windmill[] windmill;
+
+        CharacterClass character1;
+
+        Fish[] fishes;
+
+        Vector3 currentPos = Vector3.Zero;
+
+        // CÂMERA
+        Camera camera;
+
+        // EFFECT
+        private BasicEffect effect;
+
+        public Game1()
+        {
+            _graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+
+            // Definindo a resolução da tela
+            Screen.GetInstance().SetWidth(_graphics.PreferredBackBufferWidth = 800);
+            Screen.GetInstance().SetHeight(_graphics.PreferredBackBufferHeight = 600);
+        }
+
+        protected override void Initialize()
+        {
+            this.camera = new Camera();
+            this.camera.SetupView(new Vector3(0f, 2f, 10f), new Vector3(0f, 0f, 0f), Vector3.Up);
+
+            // game / position / rotation / scale / state 
+            //character1 = new CharacterClass(this, new Vector3(0f, 2f, 0f), new Vector3(0f, 0f, 0f), new Vector3(1f, 1f, 1f), CharacterClass.State.Idle);
+
+            fishes = new Fish[]
+            {
+                new Fish(this, new Vector3(9f,2f,0f), new Vector3(0f,0f,0f), new Vector3(1f,1f,3f), 10f),
+            };
+
+            #region
+            cubes = new CubeDrawer[]
+            {
+                // position / rotation / scale / matrix pai
+                // peixe
+                new CubeDrawer(this, new Vector3(9f,0f,0f), new Vector3(0f,1f,0f), new Vector3(1f, 1f,3f), Matrix.Identity),
+                // Lago
+                new CubeDrawer(this, new Vector3(9f,0f,0f), new Vector3(0f,0f,0f), new Vector3(0.5f, 0.5f,0.5f), Matrix.Identity),
+                //Nascente
+                new CubeDrawer(this, new Vector3(-9f,0f,0f), new Vector3(0f,0f,0f), new Vector3(0.5f,0.5f,0.5f), Matrix.Identity),
+                // CURVAS
+                // Curva 1
+                new CubeDrawer(this, new Vector3(9f,0f,-8f), new Vector3(0f,0f,0f), new Vector3(0.5f, 0.5f,0.5f), Matrix.Identity),
+                //Curva 2
+                new CubeDrawer(this, new Vector3(-9f,0f,-8f), new Vector3(0f,0f,0f), new Vector3(0.5f, 0.5f,0.5f), Matrix.Identity),
+                // Curva 3
+                new CubeDrawer(this, new Vector3(-9f,0f,8f), new Vector3(0f,0f,0f), new Vector3(0.5f, 0.5f,0.5f), Matrix.Identity),
+                // Curva 4
+                new CubeDrawer(this, new Vector3(9f,0f,8f), new Vector3(0f,0f,0f), new Vector3(0.5f, 0.5f,0.5f), Matrix.Identity),
+            };
+
+            windmill = new Windmill[]
+            {
+                //                  position                        rotation Y            scale       
+                new Windmill(this, new Vector3(10f,0f,0f), new Vector3(0f,4.75f,0f) ,new Vector3(1.05f,1.05f,1.05f), 
+                // blade number,    blade scale
+                    4, new Vector3(1f,1f,1f)),
+
+                new Windmill(this, new Vector3(-10f,0f,0f), new Vector3(0f,-4.75f,0f), new Vector3(1.05f,1.05f,1.05f),
+                    4, new Vector3(2f,2f,2f)),
+            };
+            #endregion
+
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            effect = new BasicEffect(GraphicsDevice);
+
+            planes.Add(new PlaneDrawer(GraphicsDevice));
+
+            planes[0].SetPlaneInitialPos(new Vector3(0, 0, 0), 0f, 1f);
+
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+            // COLA: Time.deltaTime = gameTime.ElapsedGameTime.TotalSeconds
+
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+                Keyboard.GetState().IsKeyDown(Keys.Escape))
+                this.Exit();
+
+            // Update da câmera
+            camera.Update(gameTime);
+
+            // Update dos personagens
+            //character1.Update(gameTime);
+
+            foreach (var fish in fishes)
+            {
+                fish.Update(gameTime);
+            }
+
+            #region
+            // Update das malhas
+            foreach (var cube in cubes)
+            {
+                cube.Update(gameTime);
+            }
+
+            // Update do Moinho
+            foreach (var wind in windmill)
+            {
+                wind.Update(gameTime);
+            }
+
+            // ROTAÇÃO MUNDO
+            // Girar mundo no eixo Y
+            //world *= Matrix.CreateRotationY(0.01f);
+
+            // Para voltar ao passo zero
+            //world = Matrix.Identity;
+
+            // gameTime / speed
+            MoveGeometry(gameTime, 5);
+            #endregion
+
+            base.Update(gameTime);
+        }
+
+        private void MoveGeometry(GameTime gameTime, float speed)
+        {
+            Vector3 targetPos1 = new Vector3(9f, 1f, -8f);
+            float moveSpeed = speed;
+
+            //scurrentPos = new Vector3(9f,1f,0f);
+
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Vector3 direction = Vector3.Normalize(targetPos1 - currentPos);
+            float distance = Vector3.Distance(currentPos, targetPos1);
+
+            // Tolerância da distância
+            if (distance > 0.01f)
+            {
+                currentPos += direction * moveSpeed * dt;
+                cubes[0].world = Matrix.CreateTranslation(currentPos);
+            }
+        }
+
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            // CÓDIGO SECRETO DA VISUALIZAÇÃO ALÉM DA VISÃO
+            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+            effect.View = camera.GetView();
+            effect.Projection = camera.GetProjection();
+
+            // MATRIZES
+            effect.VertexColorEnabled = true;
+
+            // DESENHO DAS CLASSES DE PERSONAGEM
+            //character1.Draw(camera);
+
+            foreach (var fish in fishes)
+            {
+                fish.Draw(this.camera);
+            }
+
+            // DESENHO DAS CLASSES DE OBJETOS
+            foreach (var wind in windmill)
+            {
+                wind.Draw(this.camera);
+            }
+
+            foreach (var cube in cubes)
+            {
+                cube.Draw(this.camera);
+            }
+
+            foreach (var plane in planes)
+            {
+                plane.Draw(effect);
+            }
+
+            base.Draw(gameTime);
+        }
+    }
+}
