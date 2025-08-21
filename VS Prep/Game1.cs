@@ -15,17 +15,16 @@ namespace VS_Prep
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        // INSTÂNCIAS DE CLASSES AQUI:
-        private CubeDrawer[] cubes;
-        private List<PlaneDrawer> planes = new List<PlaneDrawer>();
-
-        Windmill[] windmill;
-
+        // PERSONAGENS
         CharacterClass character1;
 
         Fish[] fishes;
 
-        Vector3 currentPos = Vector3.Zero;
+        // CENÁRIO
+        private CubeDrawer[] cubes;
+        private List<PlaneDrawer> planes = new List<PlaneDrawer>();
+
+        Windmill[] windmill;
 
         // CÂMERA
         Camera camera;
@@ -57,12 +56,13 @@ namespace VS_Prep
                 new Fish(this, new Vector3(9f,2f,0f), new Vector3(0f,0f,0f), new Vector3(1f,1f,3f), 10f),
             };
 
+
             #region
             cubes = new CubeDrawer[]
             {
                 // position / rotation / scale / matrix pai
                 // peixe
-                new CubeDrawer(this, new Vector3(9f,0f,0f), new Vector3(0f,1f,0f), new Vector3(1f, 1f,3f), Matrix.Identity),
+                new CubeDrawer(this, new Vector3(0f,1f,0f), new Vector3(0f,0f,0f), new Vector3(2f, 1f,5f), Matrix.Identity),
                 // Lago
                 new CubeDrawer(this, new Vector3(9f,0f,0f), new Vector3(0f,0f,0f), new Vector3(0.5f, 0.5f,0.5f), Matrix.Identity),
                 //Nascente
@@ -145,30 +145,10 @@ namespace VS_Prep
             //world = Matrix.Identity;
 
             // gameTime / speed
-            MoveGeometry(gameTime, 5);
+            //MoveGeometry(gameTime, 5);
             #endregion
 
             base.Update(gameTime);
-        }
-
-        private void MoveGeometry(GameTime gameTime, float speed)
-        {
-            Vector3 targetPos1 = new Vector3(9f, 1f, -8f);
-            float moveSpeed = speed;
-
-            //scurrentPos = new Vector3(9f,1f,0f);
-
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            Vector3 direction = Vector3.Normalize(targetPos1 - currentPos);
-            float distance = Vector3.Distance(currentPos, targetPos1);
-
-            // Tolerância da distância
-            if (distance > 0.01f)
-            {
-                currentPos += direction * moveSpeed * dt;
-                cubes[0].world = Matrix.CreateTranslation(currentPos);
-            }
         }
 
         protected override void Draw(GameTime gameTime)

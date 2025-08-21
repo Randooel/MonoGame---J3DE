@@ -99,6 +99,11 @@ namespace VS_Prep
 
         private void Translation(GameTime gameTime)
         {
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            {
+                this.position.X -= (float)Math.Sin(MathHelper.ToRadians(this.angleY)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.speed;
+                this.position.Z -= (float)Math.Cos(MathHelper.ToRadians(this.angleY)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.speed;
+            }
             if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
                 this.position.X += (float)Math.Sin(MathHelper.ToRadians(this.angleY)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.speed;

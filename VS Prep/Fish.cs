@@ -16,7 +16,7 @@ namespace VS_Prep
     public class Fish
     {
         Game game;
-        public Matrix world;
+        Matrix world;
         Vector3 position, rotation, scale;
         float moveSpeed;
         Vector3 currentPos;
@@ -73,6 +73,13 @@ namespace VS_Prep
 
         public void Update(GameTime gameTime)
         {
+            // CUBE UPDATE
+            foreach (var cube in cubes)
+            {
+                cube.Update(gameTime);
+            }
+
+            // STATE MACHINE
             switch (currentState)
             {
                 case State.Idle:
@@ -86,13 +93,7 @@ namespace VS_Prep
                     break;
             }
 
-            // CUBE UPDATE
-            foreach (var cube in cubes)
-            {
-                cube.Update(gameTime);
-            }
-
-
+            /*
             if (currentState == State.Idle)
             {
                 targetPos1 = new Vector3(9f, 1f, -5f);
@@ -108,6 +109,7 @@ namespace VS_Prep
                     world = Matrix.CreateTranslation(currentPos);
                 }
             }
+            */
 
             #region
             // DEBUG
@@ -138,7 +140,7 @@ namespace VS_Prep
             }
         }
 
-        // FUNÇÕES
+        // FUNÇÕES DE ESTADO
         public void SetTargetPos(Vector3 targetPos)
         {
             //targetPos1 = targetPos;
@@ -151,12 +153,36 @@ namespace VS_Prep
 
         private void HandleSwim()
         {
-
+            Swim(gameTime, 5);
         }
 
         private void HandleLayEggs()
         {
 
+        }
+
+        // FUNÇÕES DE AÇÃO
+        private void Swim(GameTime gameTime, float speed)
+        {
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Vector3 direction = Vector3.Normalize(targetPos1 - currentPos);
+            float distance = Vector3.Distance(currentPos, targetPos1);
+
+            if (distance > 0.01f) // tolerância
+            {
+                currentPos += direction * speed * dt;
+            }
+
+            world = Matrix.Identity;
+            world *= Matrix.CreateRotationY(rotation.Y);
+            world *= Matrix.CreateScale(scale);
+            world *= Matrix.CreateTranslation(currentPos);
+        }
+
+        private void SetTargetPos(Vector3 targetPos)
+        {
+            targetPos1 = targetPos;
         }
     }
 }
