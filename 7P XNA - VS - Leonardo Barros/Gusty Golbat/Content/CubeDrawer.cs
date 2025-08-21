@@ -122,17 +122,25 @@ namespace Gusty_Golbat.Content
             this.world = newWorld;
         }
 
-        public void Draw(Camera camera)
+        public void Draw(Camera camera, Texture2D texture)
         {
+            game.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
             game.GraphicsDevice.SetVertexBuffer(this.vBuffer);
 
             effect.World = this.world;
             effect.View = camera.GetView();
             effect.Projection = camera.GetProjection();
 
+            effect.TextureEnabled = true;
+            effect.Texture = texture;
+            effect.VertexColorEnabled = false;
+            effect.LightingEnabled = false;
+
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
+
                 game.GraphicsDevice.DrawUserPrimitives<VertexPositionTexture>(
                     PrimitiveType.TriangleList,
                     verts,
@@ -141,7 +149,7 @@ namespace Gusty_Golbat.Content
                 );
             }
 
-            DrawCollider(camera);
+            DrawCollider(camera);  
         }
 
         public void DrawCollider(Camera camera)

@@ -28,7 +28,7 @@ namespace Gusty_Golbat.Content
             Damaged
         }
 
-        public Golbat(Game game, Vector3 position, Vector3 rot, Vector3 sca, float speed, Vector3 dimension, Color color, bool visible = true)
+        public Golbat(Game game, Vector3 position, Vector3 rot, Vector3 sca, float speed, Texture2D texture, Vector3 dimension, Color color, bool visible = true)
             : base(game, position, dimension, color, visible)
         {
             this.game = game;
@@ -38,6 +38,8 @@ namespace Gusty_Golbat.Content
             this.position = position;
 
             this.moveSpeed = speed;
+
+            this.texture = texture;
 
             world = Matrix.Identity;
 
@@ -85,7 +87,7 @@ namespace Gusty_Golbat.Content
         {
             foreach(var cube in cubes)
             {
-                cube.Draw(camera);
+                cube.Draw(camera, texture);
             }
 
             BasicEffect effect = new BasicEffect(game.GraphicsDevice)

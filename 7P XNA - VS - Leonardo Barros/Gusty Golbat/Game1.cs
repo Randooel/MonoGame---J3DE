@@ -2,32 +2,26 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace Gusty_Golbat
 {
     public class Game1 : Game
     {
-        // SETUP
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
         private Camera _camera;
         private BasicEffect _effect;
 
-
-        // PERSONAGEM
-        Collider[] _collider;
+        private Collider[] _collider;
         private Golbat[] _golbats;
 
-        // CENÁRIO
         private PlaneDrawer _plane;
         private Texture2D _backgroundTexture;
         private Texture2D _golbatTexture;
 
-        // ENTIDADES
-        
-
-
+        private List<Coracao> _coracoes;
 
         public Game1()
         {
@@ -35,35 +29,32 @@ namespace Gusty_Golbat
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            // SETUP
             Screen.GetInstance().SetWidth(_graphics.PreferredBackBufferWidth = 1280);
             Screen.GetInstance().SetHeight(_graphics.PreferredBackBufferHeight = 720);
         }
 
         protected override void Initialize()
         {
-            // SETUP
-            this._camera = new Camera();
-            // -5.5f
-            this._camera.SetupView(new Vector3(0f, 0f, 10f), new Vector3(0f, 0f, 0f), Vector3.Up);
+            _camera = new Camera();
+            _camera.SetupView(new Vector3(0f, 0f, 10f), Vector3.Zero, Vector3.Up);
 
-            // PERSONAGENS
             _golbats = new Golbat[]
             {
-                // Jogador
-                new Golbat(this, new Vector3(0f,0f,-8f), new Vector3(0f,0f,0f), new Vector3(0.5f ,0.5f, 0.2f), 5,
-                Vector3.One, Color.Green),
-                new Golbat(this, new Vector3(8f,0f,-8f), new Vector3(0f,0f,0f), new Vector3(1f ,1f, 1f), 0,
-                Vector3.One, Color.Green),
+                new Golbat(this, new Vector3(0f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 5, _golbatTexture, Vector3.One, Microsoft.Xna.Framework.Color.Green),
+                new Golbat(this, new Vector3(8f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 0, _golbatTexture, Vector3.One, Microsoft.Xna.Framework.Color.Green)
             };
 
-            this._collider = new Collider[]
+            _collider = new Collider[]
             {
-                new Collider(this, new Vector3(0,2,-6), new Vector3(6,4,0.5f), Color.Green),
-                new Collider(this, new Vector3(0,2, 6), new Vector3(6, 4, 0.5f), Color.Green),
+                new Collider(this, new Vector3(0,2,-6), new Vector3(6,4,0.5f), Microsoft.Xna.Framework.Color.Green),
+                new Collider(this, new Vector3(0,2,6), new Vector3(6,4,0.5f), Microsoft.Xna.Framework.Color.Green)
             };
 
-            // CENÁRIO
+            _coracoes = new List<Coracao>
+            {
+                new Coracao(this, new Vector3(10f,0f,0f), Vector3.One, Microsoft.Xna.Framework.Color.Red)
+            };
+
             _plane = new PlaneDrawer(GraphicsDevice);
             _plane.SetPlaneInitialTransform(new Vector3(0f, 0f, -10f), new Vector3(90f, 0f, 0f), new Vector3(2f, 0f, 0.7f));
 
@@ -72,13 +63,11 @@ namespace Gusty_Golbat
 
         protected override void LoadContent()
         {
-            // SETUP
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _effect = new BasicEffect(GraphicsDevice);
-            _effect.TextureEnabled = true;
+            _effect = new BasicEffect(GraphicsDevice) { TextureEnabled = true };
 
-            // CENÁRIO
             _backgroundTexture = Content.Load<Texture2D>("Background");
+            _golbatTexture = Content.Load<Texture2D>("Golbat");
         }
 
         protected override void Update(GameTime gameTime)
@@ -86,42 +75,34 @@ namespace Gusty_Golbat
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // CAMERA
             _camera.Update(gameTime);
 
-            // PERSONAGENS
-            foreach(var golbat in _golbats)
-            {
+            foreach (var golbat in _golbats)
                 golbat.Update(gameTime);
+
+            for (int i = _coracoes.Count - 1; i >= 0; i--)
+            {
+                var coracao = _coracoes[i];
+                coracao.Update(gameTime);
+
+                if (coracao.IsColliding(_golbats[0].GetBoundingBox()))
+                {
+                    Window.Title = "Coração coletado!";
+                    _coracoes.RemoveAt(i);
+                }
             }
 
-            foreach(Collider c in this._collider)
+            foreach (var c in _collider)
             {
                 if (c.IsColliding(_golbats[0].GetBoundingBox()))
                 {
                     Window.Title = "Colidiu";
-                    c.GetLineBox().SetColor(Color.Red);
-
+                    c.GetLineBox().SetColor(Microsoft.Xna.Framework.Color.Red);
                     _golbats[0].RestorePosition();
                 }
                 else
                 {
-                    Window.Title = "Gutsy Golbat";
-                    c.GetLineBox().SetColor(Color.Green);
-                }
-
-                for (int i = 0; i < _golbats.Length; i++)
-                {
-                    for (int j = i + 1; j < _golbats.Length; j++)
-                    {
-                        if (_golbats[i].IsColliding(_golbats[j].GetBoundingBox()))
-                        {
-                            Window.Title = $"Golbat {i} colidiu com Golbat {j}";
-
-                            _golbats[i].RestorePosition();
-                            _golbats[j].RestorePosition();
-                        }
-                    }
+                    c.GetLineBox().SetColor(Microsoft.Xna.Framework.Color.Green);
                 }
             }
 
@@ -130,20 +111,18 @@ namespace Gusty_Golbat
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
-            // CAMERA
             _effect.View = _camera.GetView();
             _effect.Projection = _camera.GetProjection();
 
-            // PERSONAGENS
-            foreach(var golbat in _golbats)
-            {
-                golbat.Draw(this._camera);
-            }
+            foreach (var golbat in _golbats)
+                golbat.Draw(_camera);
 
-            // CENÁRIO
-            _plane.Draw(this._effect, this._backgroundTexture);
+            foreach (var coracao in _coracoes)
+                coracao.Draw(_camera);
+
+            _plane.Draw(_effect, _backgroundTexture);
 
             base.Draw(gameTime);
         }
