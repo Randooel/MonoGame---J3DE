@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 
 namespace Gusty_Golbat.Content
 {
-    public class Golbat
+    public class Golbat : Collider
     {
         Game game;
         Matrix world;
-        Vector3 position, rotation, scale;
+        Vector3 oldPosition;
+        Vector3 rotation, scale;
         float moveSpeed;
 
         // Substituir para uma geometria do Golbat, se der tempo
         CubeDrawer[] cubes;
+        Texture2D texture;
 
         State currentState;
         public enum State
@@ -32,13 +28,14 @@ namespace Gusty_Golbat.Content
             Damaged
         }
 
-        public Golbat(Game game, Vector3 pos, Vector3 rot, Vector3 sca, float speed)
+        public Golbat(Game game, Vector3 position, Vector3 rot, Vector3 sca, float speed, Vector3 dimension, Color color, bool visible = true)
+            : base(game, position, dimension, color, visible)
         {
             this.game = game;
 
             this.scale = sca;
             this.rotation = rot;
-            this.position = pos;
+            this.position = position;
 
             this.moveSpeed = speed;
 
@@ -49,6 +46,8 @@ namespace Gusty_Golbat.Content
                 * Matrix.CreateRotationY(this.rotation.Y)
                 * Matrix.CreateRotationZ(this.rotation.Z)
                 * Matrix.CreateTranslation(this.position);
+            
+            this.SetVisible(true);
 
             Initialize();
         }
@@ -59,7 +58,7 @@ namespace Gusty_Golbat.Content
 
             cubes = new CubeDrawer[]
             {
-                new CubeDrawer(game, new Vector3(0f, 0f, 0f), Vector3.Zero, new Vector3(1f,1f,1f), this.world)
+                new CubeDrawer(game, new Vector3(0f, 0f, 0f), Vector3.Zero, new Vector3(1f,1f,1f), this.world, texture)
             };
         }
 
@@ -88,6 +87,15 @@ namespace Gusty_Golbat.Content
             {
                 cube.Draw(camera);
             }
+
+            BasicEffect effect = new BasicEffect(game.GraphicsDevice)
+            {
+                View = camera.GetView(),
+                Projection = camera.GetProjection(),
+                VertexColorEnabled = true
+            };
+
+            this.Draw(effect);
         }
 
         // FUNÇÕES DE ESTADOS
@@ -109,35 +117,44 @@ namespace Gusty_Golbat.Content
         // FUNÇÕES DE AÇÃO
         private void Translation(GameTime gameTime)
         {
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            oldPosition = position;
+            
             if (Keyboard.GetState().IsKeyDown(Keys.W))
             {
-                position.Y += moveSpeed * dt;
+                this.position.Y += this.moveSpeed * deltaTime;
             }
             if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
-                position.Y -= moveSpeed * dt;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
-            {
-                position.X += moveSpeed * dt;
+                this.position.Y -= this.moveSpeed * deltaTime;
             }
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
-                position.X -= moveSpeed * dt;
+                this.position.X -= this.moveSpeed * deltaTime;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            {
+                this.position.X += this.moveSpeed * deltaTime;
             }
 
             world = Matrix.CreateScale(scale)
-                    * Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X))
-                    * Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y))
-                    * Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z))
-                    * Matrix.CreateTranslation(position);
+            * Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X))
+            * Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y))
+            * Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z))
+            * Matrix.CreateTranslation(position);
 
-            foreach(var cube in cubes)
+            foreach (var cube in cubes)
             {
                 cube.UpdateMatrix(this.world);
             }
+
+            this.SetPosition(this.position);
+        }
+
+        public void RestorePosition()
+        {
+            this.position = this.oldPosition;
         }
     }
 }

@@ -16,11 +16,13 @@ namespace Gusty_Golbat
 
 
         // PERSONAGEM
+        Collider[] _collider;
         private Golbat[] _golbats;
 
         // CENÁRIO
         private PlaneDrawer _plane;
         private Texture2D _backgroundTexture;
+        private Texture2D _golbatTexture;
 
         // ENTIDADES
         
@@ -49,7 +51,16 @@ namespace Gusty_Golbat
             _golbats = new Golbat[]
             {
                 // Jogador
-                new Golbat(this, new Vector3(0f,0f,-8f), new Vector3(0f,0f,0f), new Vector3(0.5f ,0.5f, 0.2f), 5),
+                new Golbat(this, new Vector3(0f,0f,-8f), new Vector3(0f,0f,0f), new Vector3(0.5f ,0.5f, 0.2f), 5,
+                Vector3.One, Color.Green),
+                new Golbat(this, new Vector3(8f,0f,-8f), new Vector3(0f,0f,0f), new Vector3(1f ,1f, 1f), 0,
+                Vector3.One, Color.Green),
+            };
+
+            this._collider = new Collider[]
+            {
+                new Collider(this, new Vector3(0,2,-6), new Vector3(6,4,0.5f), Color.Green),
+                new Collider(this, new Vector3(0,2, 6), new Vector3(6, 4, 0.5f), Color.Green),
             };
 
             // CENÁRIO
@@ -82,6 +93,36 @@ namespace Gusty_Golbat
             foreach(var golbat in _golbats)
             {
                 golbat.Update(gameTime);
+            }
+
+            foreach(Collider c in this._collider)
+            {
+                if (c.IsColliding(_golbats[0].GetBoundingBox()))
+                {
+                    Window.Title = "Colidiu";
+                    c.GetLineBox().SetColor(Color.Red);
+
+                    _golbats[0].RestorePosition();
+                }
+                else
+                {
+                    Window.Title = "Gutsy Golbat";
+                    c.GetLineBox().SetColor(Color.Green);
+                }
+
+                for (int i = 0; i < _golbats.Length; i++)
+                {
+                    for (int j = i + 1; j < _golbats.Length; j++)
+                    {
+                        if (_golbats[i].IsColliding(_golbats[j].GetBoundingBox()))
+                        {
+                            Window.Title = $"Golbat {i} colidiu com Golbat {j}";
+
+                            _golbats[i].RestorePosition();
+                            _golbats[j].RestorePosition();
+                        }
+                    }
+                }
             }
 
             base.Update(gameTime);
