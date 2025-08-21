@@ -49,7 +49,7 @@ namespace Gusty_Golbat
             _golbats = new Golbat[]
             {
                 // Jogador
-                new Golbat(this, new Vector3(0f,0f,0f), new Vector3(0f,0f,0f), new Vector3(0.2f ,0.2f, 0.2f), 5),
+                new Golbat(this, new Vector3(0f,0f,-8f), new Vector3(0f,0f,0f), new Vector3(0.5f ,0.5f, 0.2f), 5),
             };
 
             // CENÁRIO

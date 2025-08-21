@@ -44,13 +44,11 @@ namespace Gusty_Golbat.Content
 
             world = Matrix.Identity;
 
-            world = Matrix.CreateScale(this.scale);
-
-            world = Matrix.CreateRotationX(this.rotation.X);
-            world = Matrix.CreateRotationY(this.rotation.Y);
-            world = Matrix.CreateRotationZ(this.rotation.Z);
-
-            world = Matrix.CreateTranslation(this.position);
+            world = Matrix.CreateScale(this.scale)
+                * Matrix.CreateRotationX(this.rotation.X)
+                * Matrix.CreateRotationY(this.rotation.Y)
+                * Matrix.CreateRotationZ(this.rotation.Z)
+                * Matrix.CreateTranslation(this.position);
 
             Initialize();
         }
@@ -111,33 +109,34 @@ namespace Gusty_Golbat.Content
         // FUNÇÕES DE AÇÃO
         private void Translation(GameTime gameTime)
         {
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             if (Keyboard.GetState().IsKeyDown(Keys.W))
             {
-                this.position.X -= (float)Math.Sin(MathHelper.ToRadians(0)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
-                this.position.Z -= (float)Math.Cos(MathHelper.ToRadians(0)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
+                position.Y += moveSpeed * dt;
             }
             if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
-                this.position.X += (float)Math.Sin(MathHelper.ToRadians(0)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
-                this.position.Z += (float)Math.Cos(MathHelper.ToRadians(0)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
+                position.Y -= moveSpeed * dt;
             }
             if (Keyboard.GetState().IsKeyDown(Keys.D))
             {
-                this.position.X += (float)Math.Sin(MathHelper.ToRadians(0 + 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
-                this.position.Z += (float)Math.Cos(MathHelper.ToRadians(0 + 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
+                position.X += moveSpeed * dt;
             }
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
-                this.position.X += (float)Math.Sin(MathHelper.ToRadians(0 - 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
-                this.position.Z += (float)Math.Cos(MathHelper.ToRadians(0 - 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
+                position.X -= moveSpeed * dt;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
+
+            world = Matrix.CreateScale(scale)
+                    * Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X))
+                    * Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y))
+                    * Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z))
+                    * Matrix.CreateTranslation(position);
+
+            foreach(var cube in cubes)
             {
-                this.position.Y -= (float)Math.Sin(MathHelper.ToRadians(0 - 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.LeftControl))
-            {
-                this.position.Y += (float)Math.Sin(MathHelper.ToRadians(0 - 90)) * gameTime.ElapsedGameTime.Milliseconds * 0.001f * this.moveSpeed;
+                cube.UpdateMatrix(this.world);
             }
         }
     }

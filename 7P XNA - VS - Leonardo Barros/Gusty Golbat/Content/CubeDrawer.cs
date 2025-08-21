@@ -147,6 +147,11 @@ namespace Gusty_Golbat.Content
             }
         }
 
+        public void UpdateMatrix(Matrix newWorld)
+        {
+            this.world = newWorld;
+        }
+
         public void Draw(Camera camera)
         {
             this.game.GraphicsDevice.SetVertexBuffer(this.vBuffer);
