@@ -20,7 +20,7 @@ namespace Gusty_Golbat
             this.game = game;
             this.position = position;
             this.scale = new Vector3(0.5f, 0.5f, 0.3f);
-            this.moveSpeed = new Random().Next(5, 10);
+            this.moveSpeed = new Random().Next(1, 15);
 
             this.world = Matrix.Identity;
             this.world *= Matrix.CreateScale(this.scale);
@@ -44,12 +44,9 @@ namespace Gusty_Golbat
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             this.position.X -= moveSpeed * delta * 0.5f;
-            this.position.Z -= moveSpeed * delta * 0.5f;
 
-            // Atualiza a posição do collider
             this.SetPosition(this.position);
 
-            // Atualiza a matriz do cubo para desenhar
             this.world = Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
             foreach (var cube in cubes)
             {

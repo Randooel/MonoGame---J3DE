@@ -22,6 +22,7 @@ namespace Gusty_Golbat
         private Texture2D _golbatTexture;
 
         private List<Coracao> _coracoes;
+        private int _coracaoCount = 0;
 
         public Game1()
         {
@@ -36,23 +37,36 @@ namespace Gusty_Golbat
         protected override void Initialize()
         {
             _camera = new Camera();
-            _camera.SetupView(new Vector3(0f, 0f, 10f), Vector3.Zero, Vector3.Up);
+            _camera.SetupView(new Vector3(-5.5f, 0f, 10f), Vector3.Zero, Vector3.Up);
 
             _golbats = new Golbat[]
             {
-                new Golbat(this, new Vector3(0f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 5, _golbatTexture, Vector3.One, Microsoft.Xna.Framework.Color.Green),
-                new Golbat(this, new Vector3(8f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 0, _golbatTexture, Vector3.One, Microsoft.Xna.Framework.Color.Green)
+                new Golbat(this, new Vector3(-15f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 5, _golbatTexture, Vector3.One, Color.Green),
+                //new Golbat(this, new Vector3(8f,0f,-8f), Vector3.Zero, new Vector3(1f,1.5f,0.5f), 0, _golbatTexture, Vector3.One, Color.Green)
             };
 
             _collider = new Collider[]
             {
-                new Collider(this, new Vector3(0,2,-6), new Vector3(6,4,0.5f), Microsoft.Xna.Framework.Color.Green),
-                new Collider(this, new Vector3(0,2,6), new Vector3(6,4,0.5f), Microsoft.Xna.Framework.Color.Green)
+                new Collider(this, new Vector3(0,2,-6), new Vector3(6,4,0.5f), Color.Green),
+                new Collider(this, new Vector3(0,2,6), new Vector3(6,4,0.5f), Color.Green)
             };
 
             _coracoes = new List<Coracao>
             {
-                new Coracao(this, new Vector3(10f,0f,0f), Vector3.One, Microsoft.Xna.Framework.Color.Red)
+                new Coracao(this, new Vector3(30f,0f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,2f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,3f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,-3f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,-2f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,-1f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,1f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,0f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,2f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,3f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,-3f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,-2f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,-1f,-8f), Vector3.One, Color.Red),
+                new Coracao(this, new Vector3(30f,1f,-8f), Vector3.One, Color.Red),
             };
 
             _plane = new PlaneDrawer(GraphicsDevice);
@@ -87,7 +101,8 @@ namespace Gusty_Golbat
 
                 if (coracao.IsColliding(_golbats[0].GetBoundingBox()))
                 {
-                    Window.Title = "Coração coletado!";
+                    _coracaoCount++;
+                    Window.Title = _coracaoCount.ToString();
                     _coracoes.RemoveAt(i);
                 }
             }
