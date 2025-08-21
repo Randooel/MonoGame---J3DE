@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Gusty_Golbat.Content;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -15,7 +16,7 @@ namespace Gusty_Golbat
 
 
         // PERSONAGEM
-
+        private Golbat[] _golbats;
 
         // CENÁRIO
         private PlaneDrawer _plane;
@@ -41,11 +42,19 @@ namespace Gusty_Golbat
         {
             // SETUP
             this._camera = new Camera();
-            this._camera.SetupView(new Vector3(-5.5f, 0f, 10f), new Vector3(0f, 0f, 0f), Vector3.Up);
+            // -5.5f
+            this._camera.SetupView(new Vector3(0f, 0f, 10f), new Vector3(0f, 0f, 0f), Vector3.Up);
+
+            // PERSONAGENS
+            _golbats = new Golbat[]
+            {
+                // Jogador
+                new Golbat(this, new Vector3(0f,0f,0f), new Vector3(0f,0f,0f), new Vector3(0.2f ,0.2f, 0.2f), 5),
+            };
 
             // CENÁRIO
-            this._plane = new PlaneDrawer(GraphicsDevice);
-            this._plane.SetPlaneInitialTransform(new Vector3(0f, 0f, -10f), new Vector3(90f, 0f, 0f), new Vector3(2f, 0f, 0.7f));
+            _plane = new PlaneDrawer(GraphicsDevice);
+            _plane.SetPlaneInitialTransform(new Vector3(0f, 0f, -10f), new Vector3(90f, 0f, 0f), new Vector3(2f, 0f, 0.7f));
 
             base.Initialize();
         }
@@ -69,6 +78,12 @@ namespace Gusty_Golbat
             // CAMERA
             _camera.Update(gameTime);
 
+            // PERSONAGENS
+            foreach(var golbat in _golbats)
+            {
+                golbat.Update(gameTime);
+            }
+
             base.Update(gameTime);
         }
 
@@ -81,7 +96,10 @@ namespace Gusty_Golbat
             _effect.Projection = _camera.GetProjection();
 
             // PERSONAGENS
-
+            foreach(var golbat in _golbats)
+            {
+                golbat.Draw(this._camera);
+            }
 
             // CENÁRIO
             _plane.Draw(this._effect, this._backgroundTexture);

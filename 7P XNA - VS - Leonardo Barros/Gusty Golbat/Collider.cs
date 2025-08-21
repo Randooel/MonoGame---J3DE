@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VS_Prep
+namespace Gusty_Golbat
 {
     public class Collider
     {
